@@ -64,16 +64,28 @@ android {
     minSdkVersion getExtOrIntegerDefault("minSdkVersion")
     targetSdkVersion getExtOrIntegerDefault("targetSdkVersion")
     buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()
+    externalNativeBuild {
+      cmake {
+        arguments "-DANDROID_STL=c++_shared"
+      }
+    }
 
   }
 
   buildFeatures {
     buildConfig true
+    prefab true
   }
 
   buildTypes {
     release {
       minifyEnabled false
+    }
+  }
+
+  externalNativeBuild {
+    cmake {
+      path "CMakeLists.txt"
     }
   }
 
@@ -110,6 +122,7 @@ repositories {
 def kotlin_version = getExtOrDefault("kotlinVersion")
 
 dependencies {
+  implementation 'com.google.oboe:oboe:1.9.0'
   // For < 0.71, this will be from the local maven repo
   // For > 0.71, this will be replaced by `com.facebook.react:react-android:$version` by react gradle plugin
   //noinspection GradleDynamicVersion
