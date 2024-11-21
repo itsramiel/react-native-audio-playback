@@ -17,20 +17,20 @@ export class AudioManager {
     openAudioStream();
   }
 
-  public async loadSound(asset: string) {
+  public async loadSound(asset: number) {
     const id = await loadSound(asset);
     return id ? new Player(id) : null;
   }
 
-  loopSounds(args: Array<[Player, boolean]>) {
+  public loopSounds(args: Array<[Player, boolean]>): void {
     loopSounds(args.map(([player, loop]) => [player.id, loop]));
   }
 
-  playSounds(args: Array<[Player, boolean]>) {
+  public playSounds(args: Array<[Player, boolean]>): void {
     playSounds(args.map(([player, loop]) => [player.id, loop]));
   }
 
-  seekSoundsTo(args: Array<[Player, number]>) {
+  public seekSoundsTo(args: Array<[Player, number]>): void {
     seekSoundsTo(args.map(([player, timeInMs]) => [player.id, timeInMs]));
   }
 }

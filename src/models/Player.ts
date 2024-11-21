@@ -7,27 +7,23 @@ export class Player {
     this.id = id;
   }
 
-  isLoaded(): this is { id: string } {
-    return typeof this.id === 'string';
-  }
-
-  async unloadSound() {
+  public unloadSound(): void {
     unloadSound(this.id);
   }
 
-  loopSound(value: boolean) {
+  public loopSound(value: boolean): void {
     loopSounds([[this.id, value]]);
   }
 
-  playSound() {
+  public playSound(): void {
     playSounds([[this.id, true]]);
   }
 
-  pauseSound() {
+  public pauseSound(): void {
     playSounds([[this.id, false]]);
   }
 
-  seekTo(timeInMs: number) {
+  public seekTo(timeInMs: number): void {
     seekSoundsTo([[this.id, timeInMs]]);
   }
 }

@@ -1,9 +1,4 @@
-import {
-  Image,
-  NativeModules,
-  Platform,
-  type ImageSourcePropType,
-} from 'react-native';
+import { Image, NativeModules, Platform } from 'react-native';
 import type { Spec } from './NativeAudioPlayback';
 
 const LINKING_ERROR =
@@ -53,10 +48,8 @@ export function loopSounds(arg: Array<[string, boolean]>): void {
   return AudioPlayback.loopSounds(arg);
 }
 
-export function loadSound(requiredAsset: string): Promise<string | null> {
-  return AudioPlayback.loadSound(
-    Image.resolveAssetSource(requiredAsset as ImageSourcePropType).uri
-  );
+export function loadSound(requiredAsset: number): Promise<string | null> {
+  return AudioPlayback.loadSound(Image.resolveAssetSource(requiredAsset).uri);
 }
 
 export function unloadSound(playerId: string) {
