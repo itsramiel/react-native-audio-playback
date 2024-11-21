@@ -121,6 +121,7 @@
     },
     "plugins": {
       "@release-it/conventional-changelog": {
+        "ignoreRecommendedBump": true,
         "preset": "angular"
       }
     }
