@@ -2920,7 +2920,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@release-it/conventional-changelog@npm:^9.0.2":
+"@release-it/conventional-changelog@npm:^9.0.3":
   version: 9.0.3
   resolution: "@release-it/conventional-changelog@npm:9.0.3"
   dependencies:
@@ -10548,7 +10548,7 @@ __metadata:
     "@evilmartians/lefthook": ^1.5.0
     "@react-native-community/cli": 15.0.1
     "@react-native/eslint-config": ^0.73.1
-    "@release-it/conventional-changelog": ^9.0.2
+    "@release-it/conventional-changelog": ^9.0.3
     "@types/jest": ^29.5.5
     "@types/react": ^18.2.44
     commitlint: ^17.0.2
