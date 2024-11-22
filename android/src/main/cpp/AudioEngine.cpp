@@ -8,10 +8,15 @@
 
 #include "audio/AAssetDataSource.h"
 
-AudioEngine::AudioEngine(double sampleRate, double channelCount):
-mDesiredSampleRate{static_cast<int32_t>(sampleRate)},
-mDesiredChannelCount{static_cast<int>(channelCount)}
-{
+void AudioEngine::setupAudioStream(double sampleRate, double channelCount) {
+    if(mAudioStream) {
+        LOGD("Setting up an audio stream while one is already available");
+        return;
+    }
+
+    mDesiredSampleRate = static_cast<int32_t>(sampleRate);
+    mDesiredChannelCount = static_cast<int>(channelCount);
+
     oboe::AudioStreamBuilder builder {};
 
     builder.setFormat(oboe::AudioFormat::Float);
@@ -34,7 +39,19 @@ mDesiredChannelCount{static_cast<int>(channelCount)}
 
 }
 
+
 void AudioEngine::openAudioStream() {
+    if(!mAudioStream) {
+        LOGD("There is no audio stream to start");
+        return;
+    }
+    auto streamState = mAudioStream->getState();
+
+    if(streamState == oboe::StreamState::Starting || streamState == oboe::StreamState::Started) {
+        LOGD("Audio stream was requested to start but it is already started");
+        return;
+    }
+
     oboe::Result result = mAudioStream->requestStart();
     if(result != oboe::Result::OK) {
         LOGE("Failed to start stream, Error: %s", oboe::convertToText(result));
@@ -42,10 +59,22 @@ void AudioEngine::openAudioStream() {
 }
 
 void AudioEngine::closeAudioStream() {
+    if(!mAudioStream) {
+        LOGD("There is no audio stream to close");
+        return;
+    }
+    auto streamState = mAudioStream->getState();
+
+    if(streamState == oboe::StreamState::Closing || streamState == oboe::StreamState::Closed) {
+        LOGD("Audio stream was requested to close but it is already closed");
+        return;
+    }
+
     oboe::Result result = mAudioStream->close();
     if(result != oboe::Result::OK) {
         LOGE("Failed to start stream, Error: %s", oboe::convertToText(result));
     }
+    mAudioStream = nullptr;
 }
 
 oboe::DataCallbackResult

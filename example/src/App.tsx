@@ -11,8 +11,8 @@ import {
 } from 'react-native';
 import { Player, AudioManager } from 'react-native-audio-playback';
 
-const audioManager = new AudioManager(44100, 2);
-audioManager.openAudioStream();
+AudioManager.shared.setupAudioStream(44100, 2);
+AudioManager.shared.openAudioStream();
 
 export default function App() {
   const [players, setPlayers] = useState<
@@ -20,28 +20,32 @@ export default function App() {
   >([]);
 
   useEffect(() => {
+    // loads the sounds
+    const players = Array<{ player: Player; title: string }>();
+
     (async () => {
-      const players = Array<{ player: Player; title: string }>();
-      const player1 = await audioManager.loadSound(
+      const player1 = await AudioManager.shared.loadSound(
         require('./assets/bamboo.mp3')
       );
       if (player1) {
         players.push({ player: player1, title: 'Bamboo' });
       }
-      const player2 = await audioManager.loadSound(
+      const player2 = await AudioManager.shared.loadSound(
         require('./assets/swords.mp3')
       );
       if (player2) {
         players.push({ player: player2, title: 'Swords' });
       }
-      const player3 = await audioManager.loadSound(
+      const player3 = await AudioManager.shared.loadSound(
         require('./assets/coins.mp3')
       );
       if (player3) {
         players.push({ player: player3, title: 'Coins' });
       }
 
-      const player4 = await audioManager.loadSound(require('./assets/axe.mp3'));
+      const player4 = await AudioManager.shared.loadSound(
+        require('./assets/axe.mp3')
+      );
 
       if (player4) {
         players.push({ player: player4, title: 'Axe' });
@@ -49,6 +53,10 @@ export default function App() {
 
       setPlayers(players);
     })();
+
+    return () => {
+      players.forEach((player) => player.player.unloadSound());
+    };
   }, []);
 
   return (
@@ -81,15 +89,17 @@ function PlayersControls({ players }: PlayersControlsProps) {
       <Text style={styles.controlsTitle}>All players</Text>
       <View style={styles.controlsInnerContainer}>
         <Button
-          title="Play all"
+          title="Play al"
           onPress={() =>
-            audioManager.playSounds(players.map((player) => [player, true]))
+            AudioManager.shared.playSounds(
+              players.map((player) => [player, true])
+            )
           }
         />
         <Button
-          title="Pause all"
+          title="Pause al"
           onPress={() =>
-            audioManager.playSounds(
+            AudioManager.shared.playSounds(
               players.map((player) => [player, false] as const)
             )
           }
@@ -97,7 +107,7 @@ function PlayersControls({ players }: PlayersControlsProps) {
         <Button
           title="Loop all"
           onPress={() =>
-            audioManager.loopSounds(
+            AudioManager.shared.loopSounds(
               players.map((player) => [player, true] as const)
             )
           }
@@ -105,7 +115,7 @@ function PlayersControls({ players }: PlayersControlsProps) {
         <Button
           title="Unloop all"
           onPress={() =>
-            audioManager.loopSounds(
+            AudioManager.shared.loopSounds(
               players.map((player) => [player, false] as const)
             )
           }

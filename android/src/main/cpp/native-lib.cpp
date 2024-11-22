@@ -9,7 +9,7 @@
 #include "AudioEngine.h"
 #include "utils/logging.h"
 
-std::unique_ptr<AudioEngine> audioEngine;
+auto audioEngine = std::make_unique<AudioEngine>();
 
 std::vector<std::pair<std::string, bool>> zipStringBooleanArrays(JNIEnv  *env, jobjectArray stringArray, jbooleanArray boolArray ){
     jsize size = env->GetArrayLength(stringArray);
@@ -69,14 +69,11 @@ std::string jstringToStdString(JNIEnv* env, jstring jStr) {
 extern "C" {
 JNIEXPORT void JNICALL
 Java_com_audioplayback_AudioPlaybackModule_setupAudioStreamNative(JNIEnv *env, jobject thiz, jdouble sample_rate, jdouble channel_count) {
-    audioEngine = std::make_unique<AudioEngine>(sample_rate, channel_count);
+    audioEngine->setupAudioStream(sample_rate, channel_count);
 }
 
 JNIEXPORT void JNICALL
 Java_com_audioplayback_AudioPlaybackModule_openAudioStreamNative(JNIEnv *env, jobject thiz) {
-    if(!audioEngine){
-        return ;
-    }
     audioEngine->openAudioStream();
 }
 
@@ -93,12 +90,6 @@ Java_com_audioplayback_AudioPlaybackModule_unloadSoundNative(JNIEnv *env, jobjec
 
 JNIEXPORT jstring JNICALL
 Java_com_audioplayback_AudioPlaybackModule_loadSoundNative(JNIEnv *env, jobject instance, jint fd, jint fileLength, jint fileOffset) {
-   if(!audioEngine){
-       LOGE("No audio engine to load sound");
-       close(fd);
-       return nullptr;
-   }
-   LOGE("Audio engine available to load sound");
    auto id = audioEngine->loadSound(fd, fileOffset, fileLength);
    // Once done, close the file descriptor
    if (close(fd) == -1) {

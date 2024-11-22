@@ -10,7 +10,14 @@ import {
 import { Player } from './Player';
 
 export class AudioManager {
-  constructor(sampleRate: number = 44100, channelCount: number = 2) {
+  public static shared = new AudioManager();
+
+  private constructor() {}
+
+  public setupAudioStream(
+    sampleRate: number = 44100,
+    channelCount: number = 2
+  ) {
     setupAudioStream(sampleRate, channelCount);
   }
 
