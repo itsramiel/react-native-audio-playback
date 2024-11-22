@@ -222,11 +222,16 @@ class AudioEngine {
     }
   }
 
-  deinit {
-    print("Deinit called")
+  public func closeAudioStream() {
     if let audioUnit {
       AudioOutputUnitStop(audioUnit)
+      AudioUnitUninitialize(audioUnit)
+      self.audioUnit = nil
     }
+  }
+
+  deinit {
+    closeAudioStream()
   }
 }
 

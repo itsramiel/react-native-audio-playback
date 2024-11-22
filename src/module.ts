@@ -36,6 +36,10 @@ export function openAudioStream(): void {
   return AudioPlayback.openAudioStream();
 }
 
+export function closeAudioStream(): void {
+  return AudioPlayback.closeAudioStream();
+}
+
 export function playSounds(arg: Array<[string, boolean]>): void {
   return AudioPlayback.playSounds(arg);
 }

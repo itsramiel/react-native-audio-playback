@@ -84,6 +84,7 @@ const audioStream = AudioManager(44100, 2)
 #### Methods:
 
 - `openAudioStream(): void`: Opens the audio stream to allow audio to be played
+- `closeAudioStream(): void`: Closes the audio stream
 - `loadSound(requiredAsset: number): Player`: Loads a local audio sound and returns a `Player` instance
 - `playSounds(args: Array<[Player, boolean]>): void` Plays/pauses multiple sounds
 - `loopSounds(args: Array<[Player, boolean]>): void` Loops/unloops multiple sounds
@@ -96,14 +97,14 @@ The `Player` class is used to manage a single sound created by an `AudioManager`
 - `playSound(): void`: Plays the sound. If the sound is already playing it does nothing. If the sound is paused, it resumes it.
 - `pauseSound(): void`: Pauses the sound
 - `seekTo(timeInMs: number): void`: Seeks the sound to a given time in Milliseconds
-- `unloadSound(): void`: Unloads the audio memory, so the Player is useless after this point. 
+- `unloadSound(): void`: Unloads the audio memory, so the Player is useless after this point.
 
 ## Sample Rates and Channel Counts
 
 If you don't know what is a `Sample Rate` or `Channel Count` and seem to be off-put bey them! **Don't be**.
 
 
-While these terms can be intimidating, it is really simple to understand enough to get this library working. 
+While these terms can be intimidating, it is really simple to understand enough to get this library working.
 
 ### Sample Rate:
 

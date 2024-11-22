@@ -4,6 +4,7 @@ import { TurboModuleRegistry } from 'react-native';
 export interface Spec extends TurboModule {
   setupAudioStream: (sampleRate: number, channelCount: number) => void;
   openAudioStream: () => void;
+  closeAudioStream: () => void;
   loopSounds: (arg: Array<[string, boolean]>) => void;
   playSounds: (arg: Array<[string, boolean]>) => void;
   seekSoundsTo: (arg: Array<[string, number]>) => void;

@@ -133,6 +133,7 @@
       "prettier"
     ],
     "rules": {
+      "no-array-constructor": "off",
       "react/react-in-jsx-scope": "off",
       "prettier/prettier": [
         "error",

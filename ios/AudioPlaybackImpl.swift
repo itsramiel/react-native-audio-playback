@@ -50,7 +50,11 @@ import AudioToolbox
   @objc public func unloadSound(id: String) {
     audioEngine?.unloadSound(id: id)
   }
-  
+
+  @objc public func closeAudioStream() {
+    audioEngine?.closeAudioStream()
+  }
+
   private func loadRemoteSound(url: URL, _ completion: @escaping (URL?) -> Void) {
     URLSession.shared.downloadTask(with: url) { localUrl, response, error in
       if let error {
