@@ -15,7 +15,7 @@ npm install react-native-audio-playback
 
 yarn:
 ```sh
-yarn install react-native-audio-playback
+yarn add react-native-audio-playback
 ```
 
 ## Usage
