@@ -24,6 +24,10 @@ RCT_EXPORT_METHOD(openAudioStream) {
   [moduleImpl openAudioStream];
 }
 
+RCT_EXPORT_METHOD(closeAudioStream) {
+  [moduleImpl openAudioStream];
+}
+
 RCT_EXPORT_METHOD(loadSound:(NSString *)uri resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
   [moduleImpl loadSoundWithUri:uri completion:^(NSString * _Nullable soundId) {
     resolve(soundId);
@@ -47,6 +51,7 @@ RCT_EXPORT_METHOD(playSounds:(NSArray *)arg) {
 RCT_EXPORT_METHOD(seekSoundsTo:(NSArray *)arg) {
   [moduleImpl seekSoundsToArg:arg];
 }
+
 
 
 // Don't compile this code when we build for the old architecture.

@@ -28,6 +28,11 @@ class AudioPlaybackModule internal constructor(context: ReactApplicationContext)
   }
 
   @ReactMethod
+  override fun closeAudioStream() {
+    closeAudioStreamNative()
+  }
+
+  @ReactMethod
   override fun openAudioStream() {
     openAudioStreamNative()
   }

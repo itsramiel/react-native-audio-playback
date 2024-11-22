@@ -1,4 +1,5 @@
 import {
+  closeAudioStream,
   loadSound,
   loopSounds,
   openAudioStream,
@@ -15,6 +16,10 @@ export class AudioManager {
 
   public openAudioStream() {
     openAudioStream();
+  }
+
+  public closeAudioStream(): void {
+    closeAudioStream();
   }
 
   public async loadSound(asset: number) {
