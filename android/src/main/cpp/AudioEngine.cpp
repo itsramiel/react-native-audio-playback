@@ -41,6 +41,13 @@ void AudioEngine::openAudioStream() {
     }
 }
 
+void AudioEngine::closeAudioStream() {
+    oboe::Result result = mAudioStream->close();
+    if(result != oboe::Result::OK) {
+        LOGE("Failed to start stream, Error: %s", oboe::convertToText(result));
+    }
+}
+
 oboe::DataCallbackResult
 AudioEngine::onAudioReady(oboe::AudioStream *oboeStream, void *audioData, int32_t numFrames) {
     memset(audioData, 0, sizeof(float) * numFrames * mDesiredChannelCount);
@@ -107,3 +114,4 @@ void AudioEngine::unloadSound(const std::string &playerId) {
         LOGE("Player with identifier: %s not found", playerId.c_str());
     }
 }
+
