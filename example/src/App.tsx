@@ -89,7 +89,7 @@ function PlayersControls({ players }: PlayersControlsProps) {
       <Text style={styles.controlsTitle}>All players</Text>
       <View style={styles.controlsInnerContainer}>
         <Button
-          title="Play al"
+          title="Play all"
           onPress={() =>
             AudioManager.shared.playSounds(
               players.map((player) => [player, true])
@@ -97,7 +97,7 @@ function PlayersControls({ players }: PlayersControlsProps) {
           }
         />
         <Button
-          title="Pause al"
+          title="Pause all"
           onPress={() =>
             AudioManager.shared.playSounds(
               players.map((player) => [player, false] as const)

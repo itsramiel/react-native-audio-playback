@@ -116,6 +116,10 @@ void AudioEngine::seekSoundsTo(const std::vector<std::pair<std::string, double>>
 }
 
 std::optional<std::string> AudioEngine::loadSound(int fd, int offset, int length) {
+    auto playersSize = mPlayers.size();
+
+    LOGD("Loading audio with already %d sounds loaded", playersSize);
+
     AudioProperties targetProperties {
             .channelCount = mDesiredChannelCount,
             .sampleRate = mDesiredSampleRate
@@ -136,6 +140,10 @@ std::optional<std::string> AudioEngine::loadSound(int fd, int offset, int length
 }
 
 void AudioEngine::unloadSound(const std::string &playerId) {
+    auto playersSize = mPlayers.size();
+
+    LOGD("Unloading audio with already %d sounds loaded", playersSize);
+
     auto it = mPlayers.find(playerId);
     if(it != mPlayers.end()) {
         mPlayers.erase(it);
