@@ -134,8 +134,14 @@ class AudioPlaybackModule internal constructor(context: ReactApplicationContext)
     return Pair(strings, bools)
   }
 
+  override fun invalidate() {
+    super.invalidate()
+    closeAudioStreamNative()
+  }
+
   private external fun setupAudioStreamNative(sampleRate: Double, channelCount: Double)
   private external fun openAudioStreamNative()
+  private external fun closeAudioStreamNative()
   private external fun playSoundsNative(ids: Array<String>, values: BooleanArray)
   private external fun loopSoundsNative(ids: Array<String>, values: BooleanArray)
   private external fun seekSoundsToNative(ids: Array<String>, values: DoubleArray)

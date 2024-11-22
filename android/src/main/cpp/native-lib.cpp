@@ -81,6 +81,11 @@ Java_com_audioplayback_AudioPlaybackModule_openAudioStreamNative(JNIEnv *env, jo
 }
 
 JNIEXPORT void JNICALL
+Java_com_audioplayback_AudioPlaybackModule_closeAudioStreamNative(JNIEnv *env, jobject thiz) {
+    audioEngine->closeAudioStream();
+}
+
+JNIEXPORT void JNICALL
 Java_com_audioplayback_AudioPlaybackModule_unloadSoundNative(JNIEnv *env, jobject instance, jstring playerId) {
     audioEngine->unloadSound(jstringToStdString(env, playerId));
 }
