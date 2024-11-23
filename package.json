@@ -118,12 +118,6 @@
     },
     "github": {
       "release": true
-    },
-    "plugins": {
-      "@release-it/conventional-changelog": {
-        "ignoreRecommendedBump": true,
-        "preset": "angular"
-      }
     }
   },
   "eslintConfig": {
