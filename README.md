@@ -1,6 +1,6 @@
 # react-native-audio-playback
 
-A react native library to play single/multi low-latency audio on android/iOS.
+⚡ Highest perf, lowest-latency react native library to play sounds on iOS/Android
 
 For Android, it uses [Google's C++ Oboe](https://github.com/google/oboe)
 
@@ -20,29 +20,27 @@ yarn add react-native-audio-playback
 
 ## Usage
 
-1. Instantiate an `AudioManager` class instance passing in `sampleRate` and `channelCount` to the constructor.
+1. Setup an Audio Stream using the singleton `AudioManager`'s `shared` static property and calling its `setupAudioStream(sampleRate: number, channelCount: number): void`
 
 [How do I know what `sampleRate` and `channelCount` I need to pass?](#sample-rates-and-channel-counts)
 
 ```ts
 import { AudioManager } from 'react-native-audio-playback';
 
-const audioManager = new AudioManager(44100, 2);
+AudioManager.shared.setupAudioStream(44100, 2)
 ```
 
 2. Load in your audio sounds as such:
 
 ```ts
-const sound1 = audioManager.loadSound(require('./assets/sound1.wav'))
-const sound2 = audioManager.loadSound(require('./assets/sound2.wav'))
+AudioManager.shared.loadSound(require('./assets/sound1.wav'))
+AudioManager.shared.loadSound(require('./assets/sound2.wav'))
 ```
 
 3. Open the audio stream from the audo manager:
 
-Note: You are able to open the audio stream before loading sounds
-
 ```ts
-audioManager.openAudioStream();
+AudioManager.shared.openAudioStream();
 ```
 
 From here you can manipulate the sounds individually:
@@ -57,11 +55,11 @@ player1.seekTo(1000) // timeInMs
 or you can manipulate the same property for different sounds at once:
 ```ts
 // multi play
-audioManager.playSounds([[player1, true], [player2, true]]);
-audioManager.playSounds([[player1, true], [player2, false]]); // you can play a sound while pausing the other
+AudioManager.shared.playSounds([[player1, true], [player2, true]]);
+AudioManager.shared.playSounds([[player1, true], [player2, false]]); // you can play a sound while pausing the other
 
 // multi loop
-audioManager.loopSounds([[player1, true], [player2, true]]);
+AudioManager.shared.loopSounds([[player1, true], [player2, true]]);
 ```
 
 Unload the sounds when you no longer need them:
@@ -74,17 +72,21 @@ player2.unloadSound();
 
 ### AudioManager
 
-The AudioManager is used to open/close the audio stream, create audio sounds, manipulate multiple sounds simultaneously:
-You create an instance of the AudioManager by calling its constructor and passing in the `sampleRate` and `channelCount`:
+The AudioManager is used to setup, open, close the audio stream, create audio sounds, manipulate multiple sounds simultaneously:
+The `AudioManager` class is a singleton and can be accessed with its static `shared` property:
 
 ```ts
-const audioStream = AudioManager(44100, 2)
+AudioManager.shared.<some-method>
 ```
 
 #### Methods:
 
+- `setupAudioStream(sampleRate: number = 44100, channelCount: number = 2): void`: sets up the Audio Stream to allow it later be opened.
+Note: You shouldn't setup multiple streams simultaneously because you only need one stream. Trying to setup another one will simply fails because there is already one setup.
 - `openAudioStream(): void`: Opens the audio stream to allow audio to be played
+Note: You should have called `setupAudioStream` before calling this method. You can't open a stream that hasn't been setup
 - `closeAudioStream(): void`: Closes the audio stream
+Note: After this, you need to resetup the audio stream and then repon it to play sounds. The loaded sounds are still loaded and you dont have to reload them.
 - `loadSound(requiredAsset: number): Player`: Loads a local audio sound and returns a `Player` instance
 - `playSounds(args: Array<[Player, boolean]>): void` Plays/pauses multiple sounds
 - `loopSounds(args: Array<[Player, boolean]>): void` Loops/unloops multiple sounds
