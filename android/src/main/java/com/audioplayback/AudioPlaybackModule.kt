@@ -22,38 +22,46 @@ class AudioPlaybackModule internal constructor(context: ReactApplicationContext)
     return NAME
   }
 
+  @ReactMethod
   override fun setupAudioStream(sampleRate: Double, channelCount: Double) {
     setupAudioStreamNative(sampleRate, channelCount)
   }
 
+  @ReactMethod
   override fun closeAudioStream() {
     closeAudioStreamNative()
   }
 
+  @ReactMethod
   override fun openAudioStream() {
     openAudioStreamNative()
   }
 
+  @ReactMethod
   override fun loopSounds(arg: ReadableArray) {
     val (ids, values) = readableArrayToStringBooleanArray(arg)
     loopSoundsNative(ids, values)
   }
 
+  @ReactMethod
   override fun playSounds(arg: ReadableArray) {
     val (ids, values) = readableArrayToStringBooleanArray(arg)
     playSoundsNative(ids, values)
   }
 
+  @ReactMethod
   override fun seekSoundsTo(arg: ReadableArray) {
     val (ids, doubles) = readableArrayToStringDoubleArray(arg)
     seekSoundsToNative(ids, doubles)
   }
 
 
+  @ReactMethod
   override fun unloadSound(id: String) {
     unloadSoundNative(id)
   }
 
+  @ReactMethod
   override fun loadSound(uri: String, promise: Promise) {
     val scheme = Uri.parse(uri).scheme
     if( scheme == null) {
