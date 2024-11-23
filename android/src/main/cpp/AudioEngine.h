@@ -15,7 +15,7 @@
 
 class AudioEngine : public oboe::AudioStreamDataCallback{
 public:
-    explicit AudioEngine(double sampleRate, double channelCount);
+    void setupAudioStream(double sampleRate, double channelCount);
     void openAudioStream();
     void closeAudioStream();
     std::optional<std::string> loadSound(int fd, int offset, int length);

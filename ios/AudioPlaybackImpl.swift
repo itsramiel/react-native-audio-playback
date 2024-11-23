@@ -2,26 +2,26 @@ import AVFoundation
 import AudioToolbox
 
 @objc public class AudioPlaybackImpl: NSObject {
-  var audioEngine: AudioEngine?
+  let audioEngine = AudioEngine()
 
   @objc public func setupAudioStream(sampleRate: Double, channelCount: Double) {
-    audioEngine = AudioEngine(sampleRate: sampleRate, channelCount: Int(channelCount))
+    audioEngine.setupAudioStream(sampleRate: sampleRate, channelCount: Int(channelCount))
   }
 
   @objc public func openAudioStream() {
-    audioEngine?.openAudioStream()
+    audioEngine.openAudioStream()
   }
 
   @objc public func loopSounds(arg: NSArray) {
-    audioEngine?.loopSounds(convertNSArrayToArrayOfStringBoolTuples(arg))
+    audioEngine.loopSounds(convertNSArrayToArrayOfStringBoolTuples(arg))
   }
 
   @objc public func playSounds(arg: NSArray) {
-    audioEngine?.playSounds(convertNSArrayToArrayOfStringBoolTuples(arg))
+    audioEngine.playSounds(convertNSArrayToArrayOfStringBoolTuples(arg))
   }
 
   @objc public func seekSoundsTo(arg: NSArray) {
-    audioEngine?.seekSoundsTo(convertNSArrayToArrayOfStringDoubleTuples(arg))
+    audioEngine.seekSoundsTo(convertNSArrayToArrayOfStringDoubleTuples(arg))
   }
 
   @objc public func loadSound(uri: String, completion: @escaping (String?) -> Void) {
@@ -34,7 +34,7 @@ import AudioToolbox
     }
 
     if isLocalFile {
-      completion(self.audioEngine?.loadAudioWith(localFileUrl: url))
+      completion(self.audioEngine.loadAudioWith(localFileUrl: url))
     } else {
       loadRemoteSound(url: url) { [weak self] localUrl in
         guard let self, let localUrl else {
@@ -42,17 +42,17 @@ import AudioToolbox
           return
         }
 
-        completion(self.audioEngine?.loadAudioWith(localFileUrl: localUrl))
+        completion(self.audioEngine.loadAudioWith(localFileUrl: localUrl))
       }
     }
   }
 
   @objc public func unloadSound(id: String) {
-    audioEngine?.unloadSound(id: id)
+    audioEngine.unloadSound(id: id)
   }
 
   @objc public func closeAudioStream() {
-    audioEngine?.closeAudioStream()
+    audioEngine.closeAudioStream()
   }
 
   private func loadRemoteSound(url: URL, _ completion: @escaping (URL?) -> Void) {
