@@ -10,22 +10,41 @@ import Foundation
 import AVFoundation
 import AudioToolbox
 
+enum AudioStreamState {
+  case initialized, opened, closed
+}
+
 class AudioEngine {
-  private let desiredSampleRate: Double
-  private let desiredChannelCount: Int
+  private var desiredSampleRate: Double = 44100
+  private var desiredChannelCount: Int = 2
   private let desiredSampleSize = MemoryLayout<Float32>.size
   private let desiredCommonFormat: AVAudioCommonFormat = .pcmFormatFloat32
   private let desiredInterleaved: Bool = true
-  private var audioDescription: AudioStreamBasicDescription
   private var audioUnit: AudioUnit?
   private var players = [String: Player]()
-  private let mixer: Mixer
+  private var audioStreamState: AudioStreamState = .closed
 
-  init(sampleRate: Double, channelCount: Int) {
+  init() {
+    // configure Audio Session
+    let audioSession = AVAudioSession.sharedInstance()
+    try? audioSession.setCategory(.playback)
+    try? audioSession.setActive(true)
+  }
+
+  public func setupAudioStream(sampleRate: Double, channelCount: Int) {
+    guard audioStreamState != .initialized else {
+      print("Trying to initialize audio stream while it is already initialized.")
+      return
+    }
+
     self.desiredSampleRate = sampleRate
     self.desiredChannelCount = channelCount
 
-    self.audioDescription = AudioStreamBasicDescription(
+    setupAudioUnit()
+  }
+
+  private func setupAudioUnit() {
+    var audioDescription = AudioStreamBasicDescription(
       mSampleRate: Float64(desiredSampleRate),
       mFormatID: kAudioFormatLinearPCM,
       mFormatFlags: kAudioFormatFlagIsFloat,
@@ -37,18 +56,6 @@ class AudioEngine {
       mReserved: 0
     )
 
-    self.mixer = Mixer(channelCount: self.desiredChannelCount)
-
-    // configure Audio Session
-    let audioSession = AVAudioSession.sharedInstance()
-    try? audioSession.setCategory(.playback)
-    try? audioSession.setActive(true)
-
-
-    setupAudioUnit()
-  }
-
-  private func setupAudioUnit() {
     var audioComponentDescription = AudioComponentDescription(
       componentType: kAudioUnitType_Output,
       componentSubType: kAudioUnitSubType_RemoteIO,
@@ -63,12 +70,17 @@ class AudioEngine {
 
     AudioComponentInstanceNew(audioComponent, &audioUnit)
 
+    guard let audioUnit else {
+      print("Failed to create Audio Unit")
+      return;
+    }
+
     AudioUnitSetProperty(
-      audioUnit!,
+      audioUnit,
       kAudioUnitProperty_StreamFormat,
       kAudioUnitScope_Input,
       0,
-      &self.audioDescription,
+      &audioDescription,
       UInt32(MemoryLayout<AudioStreamBasicDescription>.size)
     )
 
@@ -78,17 +90,21 @@ class AudioEngine {
     )
 
     AudioUnitSetProperty(
-      audioUnit!,
+      audioUnit,
       kAudioUnitProperty_SetRenderCallback,
       kAudioUnitScope_Global,
       0,
       &renderCallbackStruct,
       UInt32(MemoryLayout<AURenderCallbackStruct>.size)
     )
-    print("Callback set")
 
+    let status = AudioUnitInitialize(audioUnit)
 
-    AudioUnitInitialize(audioUnit!)
+    if(status == noErr) {
+      audioStreamState = .initialized
+    } else {
+      print("Failed to initialize Audio Unit")
+    }
   }
 
   // Render callback function
@@ -109,12 +125,19 @@ class AudioEngine {
     // zero out the output buffer before feeding to mixer
     outputBuffer.update(repeating: 0, count: Int(inNumberFrames) * audioPlayer.desiredChannelCount)
 
-    audioPlayer.mixer.renderAudio(audioData: outputBuffer, numFrames: inNumberFrames)
+    for (playerId, player) in audioPlayer.players {
+      player.renderAudio(audioData: outputBuffer, numFrames: inNumberFrames)
+    }
 
     return noErr
   }
 
   @objc public func openAudioStream() {
+    guard audioStreamState == .initialized else {
+      print("Audio stream has to be in an initialized state before opening it")
+      return
+    }
+
     guard let audioUnit else { return }
     AudioOutputUnitStart(audioUnit)
   }
@@ -187,7 +210,6 @@ class AudioEngine {
 
       let player = Player(source: DataSource(sampleCount: Int(audioFile.length * 2), data: audioBuffer, sampleRate: desiredSampleRate, channelCount: desiredChannelCount))
       self.players[uuid.uuidString] = player
-      self.mixer.addPlayer(player)
       return uuid.uuidString
     } catch {
       print("Error loading audio file: \(error.localizedDescription)")
@@ -196,9 +218,7 @@ class AudioEngine {
   }
 
   @objc public func unloadSound(id: String) {
-    if let player = players.removeValue(forKey: id) {
-      mixer.removePlayer(player)
-    }
+    players.removeValue(forKey: id)
   }
 
   public func playSounds(_ args: [(String, Bool)]) {
