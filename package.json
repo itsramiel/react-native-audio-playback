@@ -1,6 +1,6 @@
 {
   "name": "react-native-audio-playback",
-  "version": "0.2.0-alpha.0",
+  "version": "0.2.0-alpha.1",
   "description": "A react native library to play low-latency audio on android/iOS",
   "source": "./src/index.tsx",
   "main": "./lib/commonjs/index.js",
