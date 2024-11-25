@@ -6,6 +6,7 @@ import android.util.Log
 import java.io.File
 import java.net.HttpURLConnection
 import java.net.URL
+import java.util.UUID
 
 class FileDescriptorProps(val id: Int, val length: Int, val offset: Int) {
   companion object {
@@ -28,7 +29,7 @@ class FileDescriptorProps(val id: Int, val length: Int, val offset: Int) {
         // Save the downloaded file to a temporary file
         val inputStream = connection.inputStream
         val tempFile =
-          File(context.cacheDir, "tempSoundFile")
+          File(context.cacheDir, "tempSoundFile_${UUID.randomUUID()}")
         tempFile.outputStream().use { outputStream ->
           inputStream.copyTo(outputStream)
         }
