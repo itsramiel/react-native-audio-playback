@@ -8,10 +8,9 @@
 
 #include "audio/AAssetDataSource.h"
 
-void AudioEngine::setupAudioStream(double sampleRate, double channelCount) {
+SetupAudioStreamResult AudioEngine::setupAudioStream(double sampleRate, double channelCount) {
     if(mAudioStream) {
-        LOGD("Setting up an audio stream while one is already available");
-        return;
+        return { .error =  "Setting up an audio stream while one is already available"};
     }
 
     mDesiredSampleRate = static_cast<int32_t>(sampleRate);
@@ -32,49 +31,50 @@ void AudioEngine::setupAudioStream(double sampleRate, double channelCount) {
     oboe::Result result = builder.openStream(mAudioStream);
 
     if( result != oboe::Result::OK) {
-        LOGE("Failed to open stream. Error: %s", convertToText(result));
+        auto error = "Failed to open stream:" + std::string (convertToText(result));
+        return { .error = error};
     } else {
-        LOGE("Opened stream successfully");
+        return {.error = std::nullopt};
     }
-
 }
 
 
-void AudioEngine::openAudioStream() {
+OpenAudioStreamResult AudioEngine::openAudioStream() {
     if(!mAudioStream) {
-        LOGD("There is no audio stream to start");
-        return;
+        return {.error = "There is no audio stream to start" };
     }
     auto streamState = mAudioStream->getState();
 
     if(streamState == oboe::StreamState::Starting || streamState == oboe::StreamState::Started) {
-        LOGD("Audio stream was requested to start but it is already started");
-        return;
+        return {.error = "Audio stream was requested to start but it is already started"};
     }
 
     oboe::Result result = mAudioStream->requestStart();
     if(result != oboe::Result::OK) {
-        LOGE("Failed to start stream, Error: %s", oboe::convertToText(result));
+       auto error = "Failed to start stream, Error: %s" + std::string(oboe::convertToText(result));
+       return {.error = error};
+    } else {
+        return {.error = std::nullopt};
     }
 }
 
-void AudioEngine::closeAudioStream() {
+CloseAudioStreamResult AudioEngine::closeAudioStream() {
     if(!mAudioStream) {
-        LOGD("There is no audio stream to close");
-        return;
+        return { .error = "There is no audio stream to close" };
     }
     auto streamState = mAudioStream->getState();
 
     if(streamState == oboe::StreamState::Closing || streamState == oboe::StreamState::Closed) {
-        LOGD("Audio stream was requested to close but it is already closed");
-        return;
+        return { .error = "Audio stream was requested to close but it is already closed" };
     }
 
     oboe::Result result = mAudioStream->close();
     if(result != oboe::Result::OK) {
-        LOGE("Failed to start stream, Error: %s", oboe::convertToText(result));
+        auto error ="Failed to close stream: %s" + std::string(oboe::convertToText(result));
+        return {.error = error};
     }
     mAudioStream = nullptr;
+    return {.error = std::nullopt};
 }
 
 oboe::DataCallbackResult
@@ -115,7 +115,7 @@ void AudioEngine::seekSoundsTo(const std::vector<std::pair<std::string, double>>
     }
 }
 
-std::optional<std::string> AudioEngine::loadSound(int fd, int offset, int length) {
+LoadSoundResult AudioEngine::loadSound(int fd, int offset, int length) {
     auto playersSize = mPlayers.size();
 
     LOGD("Loading audio with already %d sounds loaded", playersSize);
@@ -125,30 +125,28 @@ std::optional<std::string> AudioEngine::loadSound(int fd, int offset, int length
             .sampleRate = mDesiredSampleRate
     };
 
-    std::shared_ptr<AAssetDataSource> mClapSource {
-            AAssetDataSource::newFromCompressedAsset(fd, offset, length, targetProperties)
-    };
 
-    if(mClapSource == nullptr) {
-        LOGE("Could not load source data for clap sound");
-        return std::nullopt;
+    auto compressedAssetResult = AAssetDataSource::newFromCompressedAsset(fd, offset, length, targetProperties);
+
+    if(compressedAssetResult.error) {
+        return {.id = std::nullopt, .error = compressedAssetResult.error};
+    } else if(compressedAssetResult.dataSource == nullptr) {
+        return {.id = std::nullopt, .error = "An unknown error occurred while loading the audio file. Please create an issue with a reproducible"};
     }
 
     std::string id = uuid::generate_uuid_v4();
-    mPlayers[id] = std::make_unique<Player>(std::move(mClapSource));
-    return id;
+    mPlayers[id] = std::make_unique<Player>(compressedAssetResult.dataSource);
+    return {.id = id, .error = std::nullopt};
 }
 
-void AudioEngine::unloadSound(const std::string &playerId) {
-    auto playersSize = mPlayers.size();
-
-    LOGD("Unloading audio with already %d sounds loaded", playersSize);
-
+UnloadSoundResult AudioEngine::unloadSound(const std::string &playerId) {
     auto it = mPlayers.find(playerId);
     if(it != mPlayers.end()) {
         mPlayers.erase(it);
     } else {
-        LOGE("Player with identifier: %s not found", playerId.c_str());
+        return {.error = "Audio file could not be unloaded because it is not found"};
     }
+
+    return {.error = std::nullopt};
 }
 

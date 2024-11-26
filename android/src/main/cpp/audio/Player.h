@@ -41,8 +41,8 @@ public:
      *
      * @param source
      */
-    explicit Player(std::shared_ptr<DataSource> source)
-        : mSource(std::move(source))
+    explicit Player(DataSource *source)
+        : mSource(source)
     {};
 
     void renderAudio(float *targetData, int32_t numFrames) override;
@@ -54,7 +54,7 @@ private:
     int32_t mReadFrameIndex = 0;
     std::atomic<bool> mIsPlaying { false };
     std::atomic<bool> mIsLooping { false };
-    std::shared_ptr<DataSource> mSource;
+    std::unique_ptr<DataSource> mSource;
 };
 
 #endif //AUDIOPLAYBACK_PLAYER_H
