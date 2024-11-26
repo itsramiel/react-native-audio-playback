@@ -11,9 +11,6 @@ import {
 } from 'react-native';
 import { Player, AudioManager } from 'react-native-audio-playback';
 
-AudioManager.shared.setupAudioStream(44100, 2);
-AudioManager.shared.openAudioStream();
-
 export default function App() {
   const [players, setPlayers] = useState<
     Array<{ player: Player; title: string }>
@@ -21,26 +18,26 @@ export default function App() {
 
   useEffect(() => {
     // loads the sounds
-    const players = Array<{ player: Player; title: string }>();
+    const effectPlayers = Array<{ player: Player; title: string }>();
 
     (async () => {
       const player1 = await AudioManager.shared.loadSound(
         require('./assets/bamboo.mp3')
       );
       if (player1) {
-        players.push({ player: player1, title: 'Bamboo' });
+        effectPlayers.push({ player: player1, title: 'Bamboo' });
       }
       const player2 = await AudioManager.shared.loadSound(
         require('./assets/swords.mp3')
       );
       if (player2) {
-        players.push({ player: player2, title: 'Swords' });
+        effectPlayers.push({ player: player2, title: 'Swords' });
       }
       const player3 = await AudioManager.shared.loadSound(
         require('./assets/coins.mp3')
       );
       if (player3) {
-        players.push({ player: player3, title: 'Coins' });
+        effectPlayers.push({ player: player3, title: 'Coins' });
       }
 
       const player4 = await AudioManager.shared.loadSound(
@@ -48,99 +45,105 @@ export default function App() {
       );
 
       if (player4) {
-        players.push({ player: player4, title: 'Axe' });
+        effectPlayers.push({ player: player4, title: 'Axe' });
       }
 
-      setPlayers(players);
+      setPlayers(effectPlayers);
     })();
 
     return () => {
-      players.forEach((player) => player.player.unloadSound());
+      effectPlayers.forEach((player) => player.player.unloadSound());
     };
   }, []);
+
+  const playersExceptAxe = players
+    .filter((p) => p.title !== 'Axe')
+    .map((player) => player.player);
 
   return (
     <SafeAreaView style={styles.screen}>
       <ScrollView contentContainerStyle={styles.contentContainer}>
-        {players.map((player) => (
-          <PlayerControls
-            key={player.player.id}
-            title={player.title}
-            player={player.player}
+        <ButtonsGroup title="Audio Manager">
+          <Button
+            title="Setup Stream"
+            onPress={() => {
+              AudioManager.shared.setupAudioStream(44100, 2);
+            }}
           />
+          <Button
+            title="Open Stream"
+            onPress={() => {
+              AudioManager.shared.openAudioStream();
+            }}
+          />
+          <Button
+            title="Close Stream"
+            onPress={() => {
+              AudioManager.shared.closeAudioStream();
+            }}
+          />
+        </ButtonsGroup>
+        {players.map(({ title, player }) => (
+          <ButtonsGroup title={title} key={player.id}>
+            <Button title="Play" onPress={() => player.playSound()} />
+            <Button title="Pause" onPress={() => player.pauseSound()} />
+            <Button
+              title="Seek To 5 secs"
+              onPress={() => player.seekTo(5000)}
+            />
+            <Button title="loop" onPress={() => player.loopSound(true)} />
+            <Button title="unloop" onPress={() => player.loopSound(false)} />
+          </ButtonsGroup>
         ))}
-        <PlayersControls
-          players={players
-            .filter((p) => p.title !== 'Axe')
-            .map((player) => player.player)}
-        />
+        <ButtonsGroup title="All players">
+          <Button
+            title="Play all"
+            onPress={() =>
+              AudioManager.shared.playSounds(
+                playersExceptAxe.map((player) => [player, true])
+              )
+            }
+          />
+          <Button
+            title="Pause all"
+            onPress={() =>
+              AudioManager.shared.playSounds(
+                playersExceptAxe.map((player) => [player, false] as const)
+              )
+            }
+          />
+          <Button
+            title="Loop all"
+            onPress={() =>
+              AudioManager.shared.loopSounds(
+                playersExceptAxe.map((player) => [player, true] as const)
+              )
+            }
+          />
+          <Button
+            title="Unloop all"
+            onPress={() =>
+              AudioManager.shared.loopSounds(
+                playersExceptAxe.map((player) => [player, false] as const)
+              )
+            }
+          />
+        </ButtonsGroup>
       </ScrollView>
     </SafeAreaView>
   );
 }
 
-interface PlayersControlsProps {
-  players: Array<Player>;
-}
-
-function PlayersControls({ players }: PlayersControlsProps) {
-  return (
-    <View style={styles.controlsContainer}>
-      <Text style={styles.controlsTitle}>All players</Text>
-      <View style={styles.controlsInnerContainer}>
-        <Button
-          title="Play all"
-          onPress={() =>
-            AudioManager.shared.playSounds(
-              players.map((player) => [player, true])
-            )
-          }
-        />
-        <Button
-          title="Pause all"
-          onPress={() =>
-            AudioManager.shared.playSounds(
-              players.map((player) => [player, false] as const)
-            )
-          }
-        />
-        <Button
-          title="Loop all"
-          onPress={() =>
-            AudioManager.shared.loopSounds(
-              players.map((player) => [player, true] as const)
-            )
-          }
-        />
-        <Button
-          title="Unloop all"
-          onPress={() =>
-            AudioManager.shared.loopSounds(
-              players.map((player) => [player, false] as const)
-            )
-          }
-        />
-      </View>
-    </View>
-  );
-}
-
-interface PlayerControlsProps {
+interface ButtonsGroupProps {
   title: string;
-  player: Player;
+  children: React.ReactNode;
 }
 
-function PlayerControls({ title, player }: PlayerControlsProps) {
+function ButtonsGroup({ title, children }: ButtonsGroupProps) {
   return (
-    <View style={styles.controlsContainer}>
-      <Text style={styles.controlsTitle}>{title}</Text>
-      <View style={styles.controlsInnerContainer}>
-        <Button title="Play" onPress={() => player.playSound()} />
-        <Button title="Pause" onPress={() => player.pauseSound()} />
-        <Button title="Seek To 5 secs" onPress={() => player.seekTo(5000)} />
-        <Button title="loop" onPress={() => player.loopSound(true)} />
-        <Button title="unloop" onPress={() => player.loopSound(false)} />
-      </View>
+    <View style={styles.buttonsGroupContainer}>
+      <Text style={styles.buttonGroupTitle}>{title}</Text>
+      <View style={styles.buttonsContainer}>{children}</View>
     </View>
   );
 }
@@ -173,18 +176,18 @@ const styles = StyleSheet.create({
     padding: 16,
     gap: 32,
   },
-  controlsContainer: {
+  buttonsGroupContainer: {
     gap: 8,
     borderRadius: 4,
     borderWidth: 2,
     borderColor: 'black',
     padding: 8,
   },
-  controlsTitle: {
+  buttonGroupTitle: {
     fontSize: 16,
     fontWeight: 'bold',
   },
-  controlsInnerContainer: {
+  buttonsContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,

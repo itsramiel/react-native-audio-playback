@@ -14,6 +14,32 @@ enum AudioStreamState {
   case initialized, opened, closed
 }
 
+enum AudioEngineError: LocalizedError {
+  case audioStreamAlreadyInitialized
+  case failedToSetupAudioStream(reason: String)
+  case failedToOpenAudioStream(reason: String)
+  case failedToCloseAudioStream(reason: String)
+  case failedToUnloadSound
+  case failedToLoadAudioFile(reason: String)
+
+  var errorDescription: String? {
+    switch self {
+    case .audioStreamAlreadyInitialized:
+      return "Audio stream is already initialized"
+    case .failedToSetupAudioStream(reason: let reason):
+      return "Failed to setup audio stream: \(reason)"
+    case .failedToOpenAudioStream(reason: let reason):
+      return "Failed to open audio stream: \(reason)"
+    case .failedToCloseAudioStream(reason: let reason):
+      return "Failed to close audio stream: \(reason)"
+    case .failedToUnloadSound:
+      return "Failed to unload sound. No Audio file is loaded"
+    case .failedToLoadAudioFile(reason: let reason):
+      return "Failed to load audio file: \(reason)"
+    }
+  }
+}
+
 class AudioEngine {
   private var desiredSampleRate: Double = 44100
   private var desiredChannelCount: Int = 2
@@ -31,19 +57,18 @@ class AudioEngine {
     try? audioSession.setActive(true)
   }
 
-  public func setupAudioStream(sampleRate: Double, channelCount: Int) {
+  public func setupAudioStream(sampleRate: Double, channelCount: Int) throws {
     guard audioStreamState != .initialized else {
-      print("Trying to initialize audio stream while it is already initialized.")
-      return
+      throw AudioEngineError.audioStreamAlreadyInitialized
     }
 
     self.desiredSampleRate = sampleRate
     self.desiredChannelCount = channelCount
 
-    setupAudioUnit()
+    try setupAudioUnit()
   }
 
-  private func setupAudioUnit() {
+  private func setupAudioUnit() throws {
     var audioDescription = AudioStreamBasicDescription(
       mSampleRate: Float64(desiredSampleRate),
       mFormatID: kAudioFormatLinearPCM,
@@ -65,14 +90,13 @@ class AudioEngine {
     )
 
     guard let audioComponent = AudioComponentFindNext(nil, &audioComponentDescription) else {
-      return
+      throw AudioEngineError.failedToSetupAudioStream(reason: "audio component not found")
     }
 
     AudioComponentInstanceNew(audioComponent, &audioUnit)
 
     guard let audioUnit else {
-      print("Failed to create Audio Unit")
-      return;
+      throw AudioEngineError.failedToSetupAudioStream(reason: "could not create audio unit")
     }
 
     AudioUnitSetProperty(
@@ -103,7 +127,7 @@ class AudioEngine {
     if(status == noErr) {
       audioStreamState = .initialized
     } else {
-      print("Failed to initialize Audio Unit")
+      throw AudioEngineError.failedToSetupAudioStream(reason: "initializing the stream failed")
     }
   }
 
@@ -132,93 +156,98 @@ class AudioEngine {
     return noErr
   }
 
-  @objc public func openAudioStream() {
+  @objc public func openAudioStream() throws {
     guard audioStreamState == .initialized else {
-      print("Audio stream has to be in an initialized state before opening it")
-      return
+      throw AudioEngineError.failedToOpenAudioStream(reason: "Stream is not initialized")
     }
 
     guard let audioUnit else { return }
-    AudioOutputUnitStart(audioUnit)
-  }
+    let status = AudioOutputUnitStart(audioUnit)
 
-  @objc public func loadAudioWith(localFileUrl: URL) -> String?  {
-    do {
-      // Initialize AVAudioFile
-      let audioFile = try AVAudioFile(forReading: localFileUrl)
-
-      // Get the file's processing format
-      let fileFormat = audioFile.processingFormat
-      let fileSampleRate = fileFormat.sampleRate
-      let fileChannels = fileFormat.channelCount
-      let fileCommonFormat = fileFormat.commonFormat
-      let fileInterleaved = fileFormat.isInterleaved
-
-      // Check if sample rate, channel count, and format match the desired format
-      let needsSampleRateConversion = fileSampleRate != desiredSampleRate
-      let needsChannelConversion = fileChannels != desiredChannelCount
-      let needsFormatConversion = fileCommonFormat != desiredCommonFormat
-
-      // Handle only interleaving changes; other conversions are not supported in this simplified approach
-      guard !needsSampleRateConversion,
-            !needsChannelConversion,
-            !needsFormatConversion else {
-        print("Unsupported conversion requirements. Only interleaving change is handled.")
-        return nil
-      }
-
-      // Prepare to read the audio data
-      let frameCount = AVAudioFrameCount(audioFile.length)
-      guard let pcmBuffer = AVAudioPCMBuffer(pcmFormat: fileFormat, frameCapacity: frameCount) else {
-        print("Failed to create PCM Buffer with file's format")
-        return nil
-      }
-
-      // Read the entire audio file into the buffer
-      try audioFile.read(into: pcmBuffer)
-      print("Read \(pcmBuffer.frameLength) frames in file's native format")
-
-      // Access the float32 audio data
-      guard let channelData = pcmBuffer.floatChannelData else {
-        print("Failed to access channel data")
-        return nil
-      }
-
-      let channels = Int(fileChannels)
-      let frames = Int(pcmBuffer.frameLength)
-      let totalSamples = frames * channels
-
-      // Allocate the Float32 buffer
-      var audioBuffer: [Float32]
-
-      if fileInterleaved {
-        // If the file is already interleaved, copy the data directly
-        let data = channelData[0]
-        audioBuffer = Array(UnsafeBufferPointer(start: data, count: totalSamples))
-      } else {
-        audioBuffer = Array(repeating: 0, count: totalSamples)
-        // Manual interleaving: Iterate through each frame and channel to interleave samples
-        for frame in 0..<frames {
-          for channel in 0..<channels {
-            audioBuffer[frame * channels + channel] = channelData[channel][frame]
-          }
-        }
-      }
-
-      let uuid = UUID()
-
-
-      let player = Player(source: DataSource(sampleCount: Int(audioFile.length * 2), data: audioBuffer, sampleRate: desiredSampleRate, channelCount: desiredChannelCount))
-      self.players[uuid.uuidString] = player
-      return uuid.uuidString
-    } catch {
-      print("Error loading audio file: \(error.localizedDescription)")
-      return nil
+    if(status == noErr) {
+      audioStreamState = .opened
+    } else {
+      throw AudioEngineError.failedToOpenAudioStream(reason: "Stream could not be open")
     }
   }
 
-  @objc public func unloadSound(id: String) {
-    players.removeValue(forKey: id)
+  @objc public func loadAudioWith(localFileUrl: URL) throws -> String  {
+    let audioFile: AVAudioFile
+    do {
+      audioFile = try AVAudioFile(forReading: localFileUrl)
+    } catch {
+      throw AudioEngineError.failedToLoadAudioFile(reason: "Could not create AVAudioFile")
+    }
+
+    let fileFormat = audioFile.processingFormat
+    let fileSampleRate = fileFormat.sampleRate
+    let fileChannels = fileFormat.channelCount
+    let fileCommonFormat = fileFormat.commonFormat
+    let fileInterleaved = fileFormat.isInterleaved
+
+    guard fileSampleRate == desiredSampleRate else {
+      throw AudioEngineError.failedToLoadAudioFile(reason: "Sample rate mismatch. Resampling is not supported. File sample rate: \(fileSampleRate), stream sample rate: \(desiredSampleRate).")
+    }
+
+    guard fileChannels == desiredChannelCount else {
+      throw AudioEngineError.failedToLoadAudioFile(reason: "Channel count mismatch. File channel count: \(fileChannels), stream channel count: \(desiredChannelCount).")
+    }
+
+    guard fileCommonFormat == desiredCommonFormat else {
+      throw AudioEngineError.failedToLoadAudioFile(reason: "Format mismatch. File format: \(fileCommonFormat), stream format: \(desiredCommonFormat).")
+    }
+
+    // Prepare to read the audio data
+    let frameCount = AVAudioFrameCount(audioFile.length)
+    guard let pcmBuffer = AVAudioPCMBuffer(pcmFormat: fileFormat, frameCapacity: frameCount) else {
+      throw AudioEngineError.failedToLoadAudioFile(reason: "Could not create AVAudioPCMBuffer.")
+    }
+
+    do {
+      // Read the entire audio file into the buffer
+      try audioFile.read(into: pcmBuffer)
+    } catch {
+      throw AudioEngineError.failedToLoadAudioFile(reason: "Could not read audio file into buffer: \(error.localizedDescription).")
+    }
+
+    // Access the float32 audio data
+    guard let channelData = pcmBuffer.floatChannelData else {
+      throw AudioEngineError.failedToLoadAudioFile(reason: "Could not access audio data.")
+    }
+
+    let channels = Int(fileChannels)
+    let frames = Int(pcmBuffer.frameLength)
+    let totalSamples = frames * channels
+
+    // Allocate the Float32 buffer
+    var audioBuffer: [Float32]
+
+    if fileInterleaved {
+      // If the file is already interleaved, copy the data directly
+      let data = channelData[0]
+      audioBuffer = Array(UnsafeBufferPointer(start: data, count: totalSamples))
+    } else {
+      audioBuffer = Array(repeating: 0, count: totalSamples)
+      // Manual interleaving: Iterate through each frame and channel to interleave samples
+      for frame in 0..<frames {
+        for channel in 0..<channels {
+          audioBuffer[frame * channels + channel] = channelData[channel][frame]
+        }
+      }
+    }
+
+    let uuid = UUID()
+
+
+    let player = Player(source: DataSource(sampleCount: Int(audioFile.length * 2), data: audioBuffer, sampleRate: desiredSampleRate, channelCount: desiredChannelCount))
+    self.players[uuid.uuidString] = player
+    return uuid.uuidString
+  }
+
+  @objc public func unloadSound(id: String) throws {
+    guard players.removeValue(forKey: id) != nil else {
+      throw AudioEngineError.failedToUnloadSound
+    }
   }
 
   public func playSounds(_ args: [(String, Bool)]) {
@@ -242,16 +271,31 @@ class AudioEngine {
     }
   }
 
-  public func closeAudioStream() {
-    if let audioUnit {
-      AudioOutputUnitStop(audioUnit)
-      AudioUnitUninitialize(audioUnit)
-      self.audioUnit = nil
+  public func closeAudioStream() throws {
+    guard let audioUnit else {
+      throw AudioEngineError.failedToCloseAudioStream(reason: "No stream to close found.")
     }
+
+    guard audioStreamState != .closed else {
+      throw AudioEngineError.failedToCloseAudioStream(reason: "Stream is already closed.")
+    }
+
+    var status = AudioOutputUnitStop(audioUnit)
+    if(status != noErr) {
+      throw AudioEngineError.failedToCloseAudioStream(reason: "Failed to stop audio stream.")
+    }
+
+    status = AudioUnitUninitialize(audioUnit)
+    if(status != noErr) {
+      throw AudioEngineError.failedToCloseAudioStream(reason: "Failed to uninitialize audio stream.")
+    }
+
+    self.audioStreamState = .closed
+    self.audioUnit = nil
   }
 
   deinit {
-    closeAudioStream()
+    try? closeAudioStream()
   }
 }
 

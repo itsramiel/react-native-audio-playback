@@ -8,9 +8,9 @@ export interface Spec extends TurboModule {
   ) => { error: string | null };
   openAudioStream: () => { error: string | null };
   closeAudioStream: () => { error: string | null };
-  loopSounds: (arg: Array<[string, boolean]>) => { error: string | null };
-  playSounds: (arg: Array<[string, boolean]>) => { error: string | null };
-  seekSoundsTo: (arg: Array<[string, number]>) => { error: string | null };
+  loopSounds: (arg: Array<[string, boolean]>) => void;
+  playSounds: (arg: Array<[string, boolean]>) => void;
+  seekSoundsTo: (arg: Array<[string, number]>) => void;
   unloadSound: (id: string) => { error: string | null };
   loadSound: (
     uri: string
