@@ -35,19 +35,19 @@ export class AudioManager {
     return id ? new Player(id) : null;
   }
 
-  public loopSounds(args: Array<[Player, boolean]>): void {
+  public loopSounds(args: ReadonlyArray<[Player, boolean]>): void {
     loopSounds(args.map(([player, loop]) => [player.id, loop]));
   }
 
-  public playSounds(args: Array<[Player, boolean]>): void {
+  public playSounds(args: ReadonlyArray<[Player, boolean]>): void {
     playSounds(args.map(([player, loop]) => [player.id, loop]));
   }
 
-  public seekSoundsTo(args: Array<[Player, number]>): void {
+  public seekSoundsTo(args: ReadonlyArray<[Player, number]>): void {
     seekSoundsTo(args.map(([player, timeInMs]) => [player.id, timeInMs]));
   }
 
-  public setSoundsVolume(args: Array<[Player, number]>): void {
+  public setSoundsVolume(args: ReadonlyArray<[Player, number]>): void {
     setSoundsVolume(args.map(([player, volume]) => [player.id, volume]));
   }
 }
