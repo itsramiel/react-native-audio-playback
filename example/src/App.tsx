@@ -5,29 +5,37 @@ import { Button, VolumeSlider } from './components';
 
 export default function App() {
   const [players, setPlayers] = useState<
-    Array<{ player: Player; title: string }>
+    Array<{ player: Player; title: string; grouped: boolean }>
   >([]);
 
   const loadSounds = useCallback(async () => {
-    const loadedPlayers = Array<{ player: Player; title: string }>();
+    const loadedPlayers = Array<(typeof players)[number]>();
     try {
       const player1 = await AudioManager.shared.loadSound(
         require('./assets/bamboo.mp3')
       );
       if (player1) {
-        loadedPlayers.push({ player: player1, title: 'Bamboo' });
+        loadedPlayers.push({
+          player: player1,
+          title: 'Bamboo',
+          grouped: false,
+        });
       }
       const player2 = await AudioManager.shared.loadSound(
         require('./assets/swords.mp3')
       );
       if (player2) {
-        loadedPlayers.push({ player: player2, title: 'Swords' });
+        loadedPlayers.push({
+          player: player2,
+          title: 'Swords',
+          grouped: false,
+        });
       }
       const player3 = await AudioManager.shared.loadSound(
         require('./assets/coins.mp3')
       );
       if (player3) {
-        loadedPlayers.push({ player: player3, title: 'Coins' });
+        loadedPlayers.push({ player: player3, title: 'Coins', grouped: false });
       }
 
       const player4 = await AudioManager.shared.loadSound(
@@ -35,7 +43,7 @@ export default function App() {
       );
 
       if (player4) {
-        loadedPlayers.push({ player: player4, title: 'Axe' });
+        loadedPlayers.push({ player: player4, title: 'Axe', grouped: false });
       }
 
       setPlayers(loadedPlayers);
@@ -44,8 +52,8 @@ export default function App() {
     }
   }, []);
 
-  const playersExceptAxe = players
-    .filter((p) => p.title !== 'Axe')
+  const groupedPlayers = players
+    .filter((p) => p.grouped)
     .map((player) => player.player);
 
   return (
@@ -88,12 +96,29 @@ export default function App() {
             />
           </ButtonsGroup>
         ))}
-        <ButtonsGroup title="All players">
+        <ButtonsGroup title="Multi Control">
+          <View style={styles.groupedButtonsContainer}>
+            {players.map(({ title, grouped, player }) => (
+              <Button
+                key={player.id}
+                title={`${title} ${grouped ? '✅' : '❌'}`}
+                onPress={() => {
+                  setPlayers((prev) =>
+                    prev.map((p) =>
+                      p.player.id === player.id
+                        ? { ...p, grouped: !p.grouped }
+                        : p
+                    )
+                  );
+                }}
+              />
+            ))}
+          </View>
           <Button
             title="Play all"
             onPress={() =>
               AudioManager.shared.playSounds(
-                playersExceptAxe.map((player) => [player, true])
+                groupedPlayers.map((player) => [player, true])
               )
             }
           />
@@ -101,7 +126,7 @@ export default function App() {
             title="Pause all"
             onPress={() =>
               AudioManager.shared.playSounds(
-                playersExceptAxe.map((player) => [player, false] as const)
+                groupedPlayers.map((player) => [player, false] as const)
               )
             }
           />
@@ -109,7 +134,7 @@ export default function App() {
             title="Loop all"
             onPress={() =>
               AudioManager.shared.loopSounds(
-                playersExceptAxe.map((player) => [player, true] as const)
+                groupedPlayers.map((player) => [player, true] as const)
               )
             }
           />
@@ -117,7 +142,15 @@ export default function App() {
             title="Unloop all"
             onPress={() =>
               AudioManager.shared.loopSounds(
-                playersExceptAxe.map((player) => [player, false] as const)
+                groupedPlayers.map((player) => [player, false] as const)
+              )
+            }
+          />
+          <VolumeSlider
+            style={styles.volumeSlider}
+            onChange={(volume) =>
+              AudioManager.shared.setSoundsVolume(
+                groupedPlayers.map((player) => [player, volume] as const)
               )
             }
           />
@@ -164,6 +197,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
+  },
+  groupedButtonsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginBottom: 8,
+    width: '100%',
   },
   volumeSlider: {
     width: '100%',
