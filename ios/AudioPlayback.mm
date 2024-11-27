@@ -60,6 +60,11 @@ RCT_EXPORT_METHOD(seekSoundsTo:(NSArray *)arg) {
   [moduleImpl seekSoundsToArg:arg];
 }
 
+RCT_EXPORT_METHOD(setSoundsVolume:(NSArray *)arg) {
+  [moduleImpl setSoundsVolumeWithArg:arg];
+}
+
+
 
 
 // Don't compile this code when we build for the old architecture.

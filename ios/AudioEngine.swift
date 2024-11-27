@@ -271,6 +271,14 @@ class AudioEngine {
     }
   }
 
+  public func setSoundsVolume(_ args: [(String, Double)]) {
+    for (id, volume) in args {
+      guard let player = players[id] else { continue }
+      player.setVolume(Float(volume))
+    }
+  }
+
+
   public func closeAudioStream() throws {
     guard let audioUnit else {
       throw AudioEngineError.failedToCloseAudioStream(reason: "No stream to close found.")

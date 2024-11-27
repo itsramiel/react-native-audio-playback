@@ -10,6 +10,7 @@ class Player: RenderableAudio {
     self.mSource = source
   }
 
+  private var mVolume: Float = 1
   private var mIsPlaying: Bool = false
   private var mIsLooping: Bool = false
   private var mSource: DataSource
@@ -21,6 +22,10 @@ class Player: RenderableAudio {
 
   public func setIsLooping(_ isLooping: Bool) {
     mIsLooping = isLooping
+  }
+
+  public func setVolume(_ volume: Float) {
+    mVolume = volume
   }
 
   public func seekTo(_ timeInMs: Double) {
@@ -48,7 +53,7 @@ class Player: RenderableAudio {
 
       for i in 0..<framesToRenderFromData {
         for j in 0..<mSource.channelCount {
-          audioData[i * mSource.channelCount + j] += data[Int(mReadFrameIndex) * mSource.channelCount + j]
+          audioData[i * mSource.channelCount + j] += (mVolume * data[Int(mReadFrameIndex) * mSource.channelCount + j])
         }
 
         mReadFrameIndex += 1
