@@ -71,6 +71,12 @@ class AudioPlaybackModule internal constructor(context: ReactApplicationContext)
     seekSoundsToNative(ids, doubles)
   }
 
+  @ReactMethod
+  override fun setSoundsVolume(arg: ReadableArray) {
+    val (ids, doubles) = readableArrayToStringDoubleArray(arg)
+    setSoundsVolumeNative(ids, doubles)
+  }
+
 
   @ReactMethod(isBlockingSynchronousMethod = true)
   override fun unloadSound(id: String): WritableMap {
@@ -178,6 +184,7 @@ class AudioPlaybackModule internal constructor(context: ReactApplicationContext)
   private external fun playSoundsNative(ids: Array<String>, values: BooleanArray)
   private external fun loopSoundsNative(ids: Array<String>, values: BooleanArray)
   private external fun seekSoundsToNative(ids: Array<String>, values: DoubleArray)
+  private external fun setSoundsVolumeNative(ids: Array<String>, values: DoubleArray)
   private external fun loadSoundNative(fd: Int, fileLength: Int, fileOffset: Int): LoadSoundResult
   private external fun unloadSoundNative(playerId: String): UnloadSoundResult
 

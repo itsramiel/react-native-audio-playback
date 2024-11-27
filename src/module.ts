@@ -61,6 +61,16 @@ export function loopSounds(arg: Array<[string, boolean]>): void {
   AudioPlayback.loopSounds(arg);
 }
 
+export function setSoundsVolume(arg: Array<[string, number]>): void {
+  for (const [_, volume] of arg) {
+    if (volume < 0 || volume > 1) {
+      throw new Error('Volume must be between 0 and 1');
+    }
+  }
+
+  AudioPlayback.setSoundsVolume(arg);
+}
+
 export async function loadSound(requiredAsset: number): Promise<string> {
   const res = await AudioPlayback.loadSound(
     Image.resolveAssetSource(requiredAsset).uri

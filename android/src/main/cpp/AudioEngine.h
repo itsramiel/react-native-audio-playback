@@ -22,6 +22,7 @@ public:
     void playSounds(const std::vector<std::pair<std::string, bool>>&);
     void loopSounds(const std::vector<std::pair<std::string, bool>>&);
     void seekSoundsTo(const std::vector<std::pair<std::string, double>>&);
+    void setSoundsVolume(const std::vector<std::pair<std::string, double>>&);
     LoadSoundResult loadSound(int fd, int offset, int length);
     UnloadSoundResult unloadSound(const std::string &playerId);
 

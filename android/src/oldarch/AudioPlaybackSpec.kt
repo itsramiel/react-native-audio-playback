@@ -22,6 +22,8 @@ abstract class AudioPlaybackSpec internal constructor(context: ReactApplicationC
 
   abstract fun seekSoundsTo(arg: ReadableArray)
 
+  abstract fun setSoundsVolume(arg: ReadableArray)
+
   abstract fun unloadSound(id: String): WritableMap
 
   abstract fun loadSound(uri: String, promise: Promise)

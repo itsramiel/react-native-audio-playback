@@ -180,4 +180,11 @@ Java_com_audioplayback_AudioPlaybackModule_seekSoundsToNative(JNIEnv *env, jobje
                                             jdoubleArray values) {
     audioEngine->seekSoundsTo(zipStringDoubleArrays(env, ids, values));
 }
+
+JNIEXPORT void JNICALL
+Java_com_audioplayback_AudioPlaybackModule_setSoundsVolumeNative(JNIEnv *env, jobject thiz,
+                                                                 jobjectArray ids,
+                                                                 jdoubleArray values) {
+    audioEngine->setSoundsVolume(zipStringDoubleArrays(env, ids, values));
+}
 }

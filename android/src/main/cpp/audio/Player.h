@@ -48,10 +48,12 @@ public:
     void renderAudio(float *targetData, int32_t numFrames) override;
     void setPlaying(bool isPlaying) { LOGE("Setting isPlaying to: %d", isPlaying); mIsPlaying = isPlaying; };
     void setLooping(bool isLooping) { mIsLooping = isLooping; };
+    void setVolume(float volume) { mVolume = volume; };
     void seekTo(int64_t timeInMs);
 
 private:
     int32_t mReadFrameIndex = 0;
+    float mVolume = 1;
     std::atomic<bool> mIsPlaying { false };
     std::atomic<bool> mIsLooping { false };
     std::unique_ptr<DataSource> mSource;

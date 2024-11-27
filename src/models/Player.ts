@@ -1,4 +1,10 @@
-import { loopSounds, playSounds, seekSoundsTo, unloadSound } from '../module';
+import {
+  loopSounds,
+  playSounds,
+  seekSoundsTo,
+  setSoundsVolume,
+  unloadSound,
+} from '../module';
 
 export class Player {
   public readonly id: string;
@@ -25,5 +31,9 @@ export class Player {
 
   public seekTo(timeInMs: number): void {
     seekSoundsTo([[this.id, timeInMs]]);
+  }
+
+  public setVolume(volume: number): void {
+    setSoundsVolume([[this.id, volume]]);
   }
 }

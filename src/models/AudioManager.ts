@@ -5,6 +5,7 @@ import {
   openAudioStream,
   playSounds,
   seekSoundsTo,
+  setSoundsVolume,
   setupAudioStream,
 } from '../module';
 import { Player } from './Player';
@@ -44,5 +45,9 @@ export class AudioManager {
 
   public seekSoundsTo(args: Array<[Player, number]>): void {
     seekSoundsTo(args.map(([player, timeInMs]) => [player.id, timeInMs]));
+  }
+
+  public setSoundsVolume(args: Array<[Player, number]>): void {
+    setSoundsVolume(args.map(([player, volume]) => [player.id, volume]));
   }
 }

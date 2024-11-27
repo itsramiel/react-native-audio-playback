@@ -35,7 +35,7 @@ void Player::renderAudio(float *targetData, int32_t numFrames){
 
         for (int i = 0; i < framesToRenderFromData; ++i) {
             for (int j = 0; j < properties.channelCount; ++j) {
-                targetData[(i*properties.channelCount)+j] += data[(mReadFrameIndex*properties.channelCount)+j];
+                targetData[(i*properties.channelCount)+j] += (mVolume * data[(mReadFrameIndex*properties.channelCount)+j]);
             }
 
             // Increment and handle wraparound

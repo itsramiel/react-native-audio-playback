@@ -1,43 +1,40 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import {
   StyleSheet,
   View,
-  type PressableProps,
-  Pressable,
   Text,
-  type ViewStyle,
   ScrollView,
   SafeAreaView,
+  Alert,
 } from 'react-native';
 import { Player, AudioManager } from 'react-native-audio-playback';
+import { Button, InputButton } from './components';
 
 export default function App() {
   const [players, setPlayers] = useState<
     Array<{ player: Player; title: string }>
   >([]);
 
-  useEffect(() => {
-    // loads the sounds
-    const effectPlayers = Array<{ player: Player; title: string }>();
-
-    (async () => {
+  const loadSounds = useCallback(async () => {
+    const loadedPlayers = Array<{ player: Player; title: string }>();
+    try {
       const player1 = await AudioManager.shared.loadSound(
         require('./assets/bamboo.mp3')
       );
       if (player1) {
-        effectPlayers.push({ player: player1, title: 'Bamboo' });
+        loadedPlayers.push({ player: player1, title: 'Bamboo' });
       }
       const player2 = await AudioManager.shared.loadSound(
         require('./assets/swords.mp3')
       );
       if (player2) {
-        effectPlayers.push({ player: player2, title: 'Swords' });
+        loadedPlayers.push({ player: player2, title: 'Swords' });
       }
       const player3 = await AudioManager.shared.loadSound(
         require('./assets/coins.mp3')
       );
       if (player3) {
-        effectPlayers.push({ player: player3, title: 'Coins' });
+        loadedPlayers.push({ player: player3, title: 'Coins' });
       }
 
       const player4 = await AudioManager.shared.loadSound(
@@ -45,15 +42,13 @@ export default function App() {
       );
 
       if (player4) {
-        effectPlayers.push({ player: player4, title: 'Axe' });
+        loadedPlayers.push({ player: player4, title: 'Axe' });
       }
 
-      setPlayers(effectPlayers);
-    })();
-
-    return () => {
-      effectPlayers.forEach((player) => player.player.unloadSound());
-    };
+      setPlayers(loadedPlayers);
+    } catch (e) {
+      console.log(e);
+    }
   }, []);
 
   const playersExceptAxe = players
@@ -82,6 +77,7 @@ export default function App() {
               AudioManager.shared.closeAudioStream();
             }}
           />
+          <Button title="Load Sounds" onPress={loadSounds} />
         </ButtonsGroup>
         {players.map(({ title, player }) => (
           <ButtonsGroup title={title} key={player.id}>
@@ -93,6 +89,18 @@ export default function App() {
             />
             <Button title="loop" onPress={() => player.loopSound(true)} />
             <Button title="unloop" onPress={() => player.loopSound(false)} />
+            <InputButton
+              style={styles.buttonInput}
+              title="set volume"
+              onPress={(volumeStr) => {
+                const volume = parseFloat(volumeStr);
+                if (isNaN(volume) || volume < 0 || volume > 1) {
+                  Alert.alert('Volume must be between 0 and 1');
+                  return;
+                }
+                player.setVolume(volume);
+              }}
+            />
           </ButtonsGroup>
         ))}
         <ButtonsGroup title="All players">
@@ -148,26 +156,6 @@ function ButtonsGroup({ title, children }: ButtonsGroupProps) {
   );
 }
 
-interface ButtonProps extends PressableProps {
-  title: string;
-  style?: ViewStyle;
-}
-
-function Button({ title, ...props }: ButtonProps) {
-  return (
-    <Pressable
-      {...props}
-      style={({ pressed }) => [
-        styles.buttonContainer,
-        pressed ? styles.pressedButtonContainer : undefined,
-        props.style,
-      ]}
-    >
-      <Text style={styles.buttonText}>{title}</Text>
-    </Pressable>
-  );
-}
-
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
@@ -192,16 +180,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     gap: 8,
   },
-  buttonContainer: {
-    padding: 8,
-    borderRadius: 4,
-    backgroundColor: 'blue',
-  },
-  pressedButtonContainer: {
-    backgroundColor: 'teal',
-  },
-  buttonText: {
-    color: 'white',
-    fontSize: 16,
+  buttonInput: {
+    width: '100%',
   },
 });
