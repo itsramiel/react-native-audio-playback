@@ -1,14 +1,7 @@
 import { useCallback, useState } from 'react';
-import {
-  StyleSheet,
-  View,
-  Text,
-  ScrollView,
-  SafeAreaView,
-  Alert,
-} from 'react-native';
+import { StyleSheet, View, Text, ScrollView, SafeAreaView } from 'react-native';
 import { Player, AudioManager } from 'react-native-audio-playback';
-import { Button, InputButton } from './components';
+import { Button, VolumeSlider } from './components';
 
 export default function App() {
   const [players, setPlayers] = useState<
@@ -89,17 +82,9 @@ export default function App() {
             />
             <Button title="loop" onPress={() => player.loopSound(true)} />
             <Button title="unloop" onPress={() => player.loopSound(false)} />
-            <InputButton
-              style={styles.buttonInput}
-              title="set volume"
-              onPress={(volumeStr) => {
-                const volume = parseFloat(volumeStr);
-                if (isNaN(volume) || volume < 0 || volume > 1) {
-                  Alert.alert('Volume must be between 0 and 1');
-                  return;
-                }
-                player.setVolume(volume);
-              }}
+            <VolumeSlider
+              style={styles.volumeSlider}
+              onChange={(volume) => player.setVolume(volume)}
             />
           </ButtonsGroup>
         ))}
@@ -179,6 +164,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
+  },
+  volumeSlider: {
+    width: '100%',
   },
   buttonInput: {
     width: '100%',
