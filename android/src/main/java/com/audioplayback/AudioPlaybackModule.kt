@@ -1,13 +1,19 @@
 package com.audioplayback
 
 import android.net.Uri
-import android.util.Log
+import com.audioplayback.models.CloseAudioStreamResult
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.ReadableArray
 import com.facebook.react.bridge.ReadableType
 import com.audioplayback.models.FileDescriptorProps
+import com.audioplayback.models.LoadSoundResult
+import com.audioplayback.models.OpenAudioStreamResult
+import com.audioplayback.models.SetupAudioStreamResult
+import com.audioplayback.models.UnloadSoundResult
+import com.facebook.react.bridge.Arguments
+import com.facebook.react.bridge.WritableMap
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -22,20 +28,30 @@ class AudioPlaybackModule internal constructor(context: ReactApplicationContext)
     return NAME
   }
 
-  @ReactMethod
-  override fun setupAudioStream(sampleRate: Double, channelCount: Double) {
-    setupAudioStreamNative(sampleRate, channelCount)
+  @ReactMethod(isBlockingSynchronousMethod = true)
+  override fun setupAudioStream(sampleRate: Double, channelCount: Double): WritableMap {
+    val result = setupAudioStreamNative(sampleRate, channelCount)
+    val map = Arguments.createMap()
+    result.error?.let { map.putString("error", it) } ?: map.putNull("error")
+    return map
   }
 
-  @ReactMethod
-  override fun closeAudioStream() {
-    closeAudioStreamNative()
+  @ReactMethod(isBlockingSynchronousMethod = true)
+  override fun openAudioStream(): WritableMap {
+    val result = openAudioStreamNative()
+    val map = Arguments.createMap()
+    result.error?.let { map.putString("error", it) } ?: map.putNull("error")
+    return map
   }
 
-  @ReactMethod
-  override fun openAudioStream() {
-    openAudioStreamNative()
+  @ReactMethod(isBlockingSynchronousMethod = true)
+  override fun closeAudioStream(): WritableMap {
+    val result = closeAudioStreamNative()
+    val map = Arguments.createMap()
+    result.error?.let { map.putString("error", it) } ?: map.putNull("error")
+    return map
   }
+
 
   @ReactMethod
   override fun loopSounds(arg: ReadableArray) {
@@ -56,17 +72,25 @@ class AudioPlaybackModule internal constructor(context: ReactApplicationContext)
   }
 
 
-  @ReactMethod
-  override fun unloadSound(id: String) {
-    unloadSoundNative(id)
+  @ReactMethod(isBlockingSynchronousMethod = true)
+  override fun unloadSound(id: String): WritableMap {
+    val result = unloadSoundNative(id)
+    val map = Arguments.createMap()
+    result.error?.let { map.putString("error", it) } ?: map.putNull("error")
+    return map
   }
 
   @ReactMethod
   override fun loadSound(uri: String, promise: Promise) {
+    val map = Arguments.createMap()
+
     val scheme = Uri.parse(uri).scheme
     if( scheme == null) {
       val fileDescriptorProps = FileDescriptorProps.fromLocalResource(reactApplicationContext, uri)
-      return promise.resolve(loadSoundNative(fileDescriptorProps.id, fileDescriptorProps.length, fileDescriptorProps.offset))
+      val result = loadSoundNative(fileDescriptorProps.id, fileDescriptorProps.length, fileDescriptorProps.offset);
+      result.error?.let { map.putString("error", it) } ?: map.putNull("error")
+      result.id?.let { map.putString("id", it) } ?: map.putNull("id")
+      promise.resolve(map)
     } else {
       CoroutineScope(Dispatchers.Main).launch {
         withContext(Dispatchers.IO) {
@@ -74,9 +98,13 @@ class AudioPlaybackModule internal constructor(context: ReactApplicationContext)
           val fileDescriptorProps = FileDescriptorProps.getFileDescriptorPropsFromUrl(reactApplicationContext, url)
           if(fileDescriptorProps == null) {
             promise.resolve(null)
-            Log.d("Could not get file descriptor info from uri", LOG)
+            map.putString("error", "Failed to load sound file")
+            map.putNull("id")
           } else {
-            promise.resolve(loadSoundNative(fileDescriptorProps.id, fileDescriptorProps.length, fileDescriptorProps.offset))
+            val result = loadSoundNative(fileDescriptorProps.id, fileDescriptorProps.length, fileDescriptorProps.offset);
+            result.error?.let { map.putString("error", it) } ?: map.putNull("error")
+            result.id?.let { map.putString("id", it) } ?: map.putNull("id")
+            promise.resolve(map)
           }
         }
       }
@@ -144,14 +172,14 @@ class AudioPlaybackModule internal constructor(context: ReactApplicationContext)
     closeAudioStreamNative()
   }
 
-  private external fun setupAudioStreamNative(sampleRate: Double, channelCount: Double)
-  private external fun openAudioStreamNative()
-  private external fun closeAudioStreamNative()
+  private external fun setupAudioStreamNative(sampleRate: Double, channelCount: Double): SetupAudioStreamResult
+  private external fun openAudioStreamNative(): OpenAudioStreamResult
+  private external fun closeAudioStreamNative(): CloseAudioStreamResult
   private external fun playSoundsNative(ids: Array<String>, values: BooleanArray)
   private external fun loopSoundsNative(ids: Array<String>, values: BooleanArray)
   private external fun seekSoundsToNative(ids: Array<String>, values: DoubleArray)
-  private external fun loadSoundNative(fd: Int, fileLength: Int, fileOffset: Int): String?
-  private external fun unloadSoundNative(playerId: String): Unit
+  private external fun loadSoundNative(fd: Int, fileLength: Int, fileOffset: Int): LoadSoundResult
+  private external fun unloadSoundNative(playerId: String): UnloadSoundResult
 
   // Example method
   // See https://reactnative.dev/docs/native-modules-android

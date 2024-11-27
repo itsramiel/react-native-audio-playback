@@ -16,26 +16,34 @@
 
 RCT_EXPORT_MODULE()
 
-RCT_EXPORT_METHOD(setupAudioStream:(double)sampleRate channelCount:(double)channelCount) {
-  [moduleImpl setupAudioStreamWithSampleRate:sampleRate channelCount:channelCount];
+RCT_EXPORT_SYNCHRONOUS_TYPED_METHOD(NSDictionary *, setupAudioStream:(double)sampleRate channelCount:(double)channelCount) {
+  NSString *error = [moduleImpl setupAudioStreamWithSampleRate:sampleRate channelCount:channelCount];
+
+  return @{@"error":error?: [NSNull null]};
 }
 
-RCT_EXPORT_METHOD(openAudioStream) {
-  [moduleImpl openAudioStream];
+RCT_EXPORT_SYNCHRONOUS_TYPED_METHOD(NSDictionary *, openAudioStream) {
+  NSString *error = [moduleImpl openAudioStream];
+
+  return @{@"error":error?: [NSNull null]};
 }
 
-RCT_EXPORT_METHOD(closeAudioStream) {
-  [moduleImpl openAudioStream];
+RCT_EXPORT_SYNCHRONOUS_TYPED_METHOD(NSDictionary *, closeAudioStream) {
+  NSString *error = [moduleImpl closeAudioStream];
+
+  return @{@"error":error?: [NSNull null]};
 }
 
 RCT_EXPORT_METHOD(loadSound:(NSString *)uri resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
-  [moduleImpl loadSoundWithUri:uri completion:^(NSString * _Nullable soundId) {
-    resolve(soundId);
+  [moduleImpl loadSoundWithUri:uri completion:^(NSString * _Nullable soundId, NSString * _Nullable error) {
+    resolve(@{@"error": error?: [NSNull null], @"id": soundId?: [NSNull null]});
   }];
 }
 
-RCT_EXPORT_METHOD(unloadSound:(NSString *)id) {
-  [moduleImpl unloadSoundWithId:id];
+RCT_EXPORT_SYNCHRONOUS_TYPED_METHOD(NSDictionary *, unloadSound:(NSString *)id) {
+  NSString *error = [moduleImpl unloadSoundWithId:id];
+
+  return @{@"error":error?: [NSNull null]};
 }
 
 RCT_EXPORT_METHOD(loopSounds:(NSArray *)arg) {

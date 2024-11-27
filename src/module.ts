@@ -29,33 +29,55 @@ export function setupAudioStream(
   sampleRate: number,
   channelCount: number
 ): void {
-  return AudioPlayback.setupAudioStream(sampleRate, channelCount);
+  const res = AudioPlayback.setupAudioStream(sampleRate, channelCount);
+  if (res.error) {
+    throw new Error(res.error);
+  }
 }
 
 export function openAudioStream(): void {
-  return AudioPlayback.openAudioStream();
+  const res = AudioPlayback.openAudioStream();
+  if (res.error) {
+    throw new Error(res.error);
+  }
 }
 
 export function closeAudioStream(): void {
-  return AudioPlayback.closeAudioStream();
+  const res = AudioPlayback.closeAudioStream();
+  if (res.error) {
+    throw new Error(res.error);
+  }
 }
 
 export function playSounds(arg: Array<[string, boolean]>): void {
-  return AudioPlayback.playSounds(arg);
+  AudioPlayback.playSounds(arg);
 }
 
 export function seekSoundsTo(arg: Array<[string, number]>): void {
-  return AudioPlayback.seekSoundsTo(arg);
+  AudioPlayback.seekSoundsTo(arg);
 }
 
 export function loopSounds(arg: Array<[string, boolean]>): void {
-  return AudioPlayback.loopSounds(arg);
+  AudioPlayback.loopSounds(arg);
 }
 
-export function loadSound(requiredAsset: number): Promise<string | null> {
-  return AudioPlayback.loadSound(Image.resolveAssetSource(requiredAsset).uri);
+export async function loadSound(requiredAsset: number): Promise<string> {
+  const res = await AudioPlayback.loadSound(
+    Image.resolveAssetSource(requiredAsset).uri
+  );
+  if (res.error) {
+    throw new Error(res.error);
+  } else if (typeof res.id !== 'string') {
+    throw new Error(
+      'An unknown error occurred while loading the audio file. Please create an issue with a reproducible'
+    );
+  }
+  return res.id;
 }
 
 export function unloadSound(playerId: string) {
-  AudioPlayback.unloadSound(playerId);
+  const res = AudioPlayback.unloadSound(playerId);
+  if (res.error) {
+    throw new Error(res.error);
+  }
 }

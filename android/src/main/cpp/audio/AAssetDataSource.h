@@ -17,18 +17,26 @@
 #ifndef AUDIOPLAYBACK_AASSETDATASOURCE_H
 #define AUDIOPLAYBACK_AASSETDATASOURCE_H
 
+#include <optional>
 #include <android/asset_manager.h>
 #include <AudioConstants.h>
 #include "DataSource.h"
 
+class AAssetDataSource;
+
+struct NewFromCompressedAssetResult {
+    AAssetDataSource *dataSource;
+    std::optional<std::string> error;
+};
+
 class AAssetDataSource : public DataSource {
 
 public:
-    int64_t getSize() const override { return mBufferSize; }
-    AudioProperties getProperties() const override { return mProperties; }
-    const float* getData() const override { return mBuffer.get(); }
+    [[nodiscard]] int64_t getSize() const override { return mBufferSize; }
+    [[nodiscard]] AudioProperties getProperties() const override { return mProperties; }
+    [[nodiscard]] const float* getData() const override { return mBuffer.get(); }
 
-    static AAssetDataSource* newFromCompressedAsset(
+    static NewFromCompressedAssetResult newFromCompressedAsset(
             int fd, int offset, int length,
             AudioProperties targetProperties);
 

@@ -24,7 +24,7 @@
 
 constexpr int kMaxCompressionRatio { 12 };
 
-AAssetDataSource *
+NewFromCompressedAssetResult
 AAssetDataSource::newFromCompressedAsset(int fd, int offset,
                                          int length, AudioProperties targetProperties) {
 
@@ -35,9 +35,12 @@ AAssetDataSource::newFromCompressedAsset(int fd, int offset,
     const long maximumDataSizeInBytes = kMaxCompressionRatio * length * sizeof(int16_t);
     auto decodedData = new uint8_t[maximumDataSizeInBytes];
 
-    int64_t bytesDecoded = NDKExtractor::decodeFileDescriptor(fd, offset, length, decodedData, targetProperties);
-    auto numSamples = bytesDecoded / sizeof(int16_t);
-    LOGE("Number of samples: %lld", numSamples);
+    auto decodeResult = NDKExtractor::decodeFileDescriptor(fd, offset, length, decodedData, targetProperties);
+    if(decodeResult.error) {
+        return {.dataSource = nullptr, .error = decodeResult.error };
+    }
+
+    auto numSamples = decodeResult.bytesRead / sizeof(int16_t);
 
     // Now we know the exact number of samples we can create a float array to hold the audio data
     auto outputBuffer = std::make_unique<float[]>(numSamples);
@@ -46,13 +49,14 @@ AAssetDataSource::newFromCompressedAsset(int fd, int offset,
     oboe::convertPcm16ToFloat(
             reinterpret_cast<int16_t*>(decodedData),
             outputBuffer.get(),
-            bytesDecoded / sizeof(int16_t));
+            decodeResult.bytesRead / sizeof(int16_t));
 
     delete[] decodedData;
-    // TODO: handle closing asset
-//    AAsset_close(asset);
 
-    return new AAssetDataSource(std::move(outputBuffer),
-                                numSamples,
-                                targetProperties);
+    return {
+            .dataSource = new AAssetDataSource(std::move(outputBuffer),
+                                               numSamples,
+                                               targetProperties),
+            .error = std::nullopt
+    };
 }

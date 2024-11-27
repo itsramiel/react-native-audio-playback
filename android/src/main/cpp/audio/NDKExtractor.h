@@ -23,14 +23,15 @@
 #include <AudioConstants.h>
 #include "utils/logging.h"
 
+struct DecodeFileDescriptorResult {
+    int32_t bytesRead;
+    std::optional<std::string> error;
+};
+
 
 class NDKExtractor {
-
 public:
-    static int32_t decode(AAsset *asset, uint8_t *targetData, AudioProperties targetProperties);
-
-    static int32_t decodeFileDescriptor(int fd, int offset, int length, uint8_t *targetData,
-                                        AudioProperties targetProperties);
+    static DecodeFileDescriptorResult decodeFileDescriptor(int fd, int offset, int length, uint8_t *targetData, AudioProperties targetProperties);
 };
 
 #endif //AUDIOPLAYBACK_NDKMEDIAEXTRACTOR_H

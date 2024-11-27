@@ -67,30 +67,79 @@ std::string jstringToStdString(JNIEnv* env, jstring jStr) {
 }
 
 extern "C" {
-JNIEXPORT void JNICALL
+JNIEXPORT jobject JNICALL
 Java_com_audioplayback_AudioPlaybackModule_setupAudioStreamNative(JNIEnv *env, jobject thiz, jdouble sample_rate, jdouble channel_count) {
-    audioEngine->setupAudioStream(sample_rate, channel_count);
+    auto result = audioEngine->setupAudioStream(sample_rate, channel_count);
+
+    jclass structClass = env->FindClass("com/audioplayback/models/SetupAudioStreamResult");
+    jmethodID constructor = env->GetMethodID(structClass, "<init>", "(Ljava/lang/String;)V");
+
+    jstring jError = result.error.has_value() ? env->NewStringUTF(result.error->c_str()): nullptr;
+    jobject returnValue = env->NewObject(structClass, constructor, jError);
+
+    if(jError) {
+        env->DeleteLocalRef(jError);
+    }
+
+    return returnValue;
 }
 
-JNIEXPORT void JNICALL
+JNIEXPORT jobject JNICALL
 Java_com_audioplayback_AudioPlaybackModule_openAudioStreamNative(JNIEnv *env, jobject thiz) {
-    audioEngine->openAudioStream();
+    auto result = audioEngine->openAudioStream();
+
+    jclass structClass = env->FindClass("com/audioplayback/models/OpenAudioStreamResult");
+    jmethodID constructor = env->GetMethodID(structClass, "<init>", "(Ljava/lang/String;)V");
+
+    jstring jError = result.error.has_value() ? env->NewStringUTF(result.error->c_str()): nullptr;
+    jobject returnValue = env->NewObject(structClass, constructor, jError);
+
+    if(jError) {
+        env->DeleteLocalRef(jError);
+    }
+
+    return returnValue;
 }
 
-JNIEXPORT void JNICALL
+JNIEXPORT jobject JNICALL
 Java_com_audioplayback_AudioPlaybackModule_closeAudioStreamNative(JNIEnv *env, jobject thiz) {
-    audioEngine->closeAudioStream();
+    auto result = audioEngine->closeAudioStream();
+
+    jclass structClass = env->FindClass("com/audioplayback/models/CloseAudioStreamResult");
+    jmethodID constructor = env->GetMethodID(structClass, "<init>", "(Ljava/lang/String;)V");
+
+    jstring jError = result.error.has_value() ? env->NewStringUTF(result.error->c_str()): nullptr;
+    jobject returnValue = env->NewObject(structClass, constructor, jError);
+
+    if(jError) {
+        env->DeleteLocalRef(jError);
+    }
+
+    return returnValue;
 }
 
-JNIEXPORT void JNICALL
+JNIEXPORT jobject JNICALL
 Java_com_audioplayback_AudioPlaybackModule_unloadSoundNative(JNIEnv *env, jobject instance, jstring playerId) {
-    audioEngine->unloadSound(jstringToStdString(env, playerId));
+    auto result = audioEngine->unloadSound(jstringToStdString(env, playerId));
+
+    jclass structClass = env->FindClass("com/audioplayback/models/UnloadSoundResult");
+    jmethodID constructor = env->GetMethodID(structClass, "<init>", "(Ljava/lang/String;)V");
+
+    jstring jError = result.error.has_value() ? env->NewStringUTF(result.error->c_str()): nullptr;
+    jobject returnValue = env->NewObject(structClass, constructor, jError);
+
+    if(jError) {
+        env->DeleteLocalRef(jError);
+    }
+
+    return returnValue;
 }
 
 
-JNIEXPORT jstring JNICALL
+JNIEXPORT jobject JNICALL
 Java_com_audioplayback_AudioPlaybackModule_loadSoundNative(JNIEnv *env, jobject instance, jint fd, jint fileLength, jint fileOffset) {
-   auto id = audioEngine->loadSound(fd, fileOffset, fileLength);
+   auto result = audioEngine->loadSound(fd, fileOffset, fileLength);
+
    // Once done, close the file descriptor
    if (close(fd) == -1) {
        LOGE("Error closing file descriptor: %s", strerror(errno));
@@ -98,11 +147,19 @@ Java_com_audioplayback_AudioPlaybackModule_loadSoundNative(JNIEnv *env, jobject 
        LOGD("File descriptor closed");
    }
 
-   if(id) {
-       return env->NewStringUTF(id->c_str());
-   } else {
-       return nullptr;
-   }
+    jclass structClass = env->FindClass("com/audioplayback/models/LoadSoundResult");
+    jmethodID constructor = env->GetMethodID(structClass, "<init>", "(Ljava/lang/String;Ljava/lang/String;)V");
+
+    jstring jError = result.error.has_value() ? env->NewStringUTF(result.error->c_str()): nullptr;
+    jstring jId = result.id.has_value() ? env->NewStringUTF(result.id->c_str()): nullptr;
+    jobject returnValue = env->NewObject(structClass, constructor, jError, jId);
+
+    if(jError) {
+        env->DeleteLocalRef(jError);
+        env->DeleteLocalRef(jId);
+    }
+
+    return returnValue;
 }
 
 

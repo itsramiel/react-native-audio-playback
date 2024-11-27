@@ -1,15 +1,31 @@
 import AVFoundation
 import AudioToolbox
 
+
 @objc public class AudioPlaybackImpl: NSObject {
+  private static let unknownError: String = "An unknown error occurred while loading the audio file. Please create an issue with a reproducible"
   let audioEngine = AudioEngine()
 
-  @objc public func setupAudioStream(sampleRate: Double, channelCount: Double) {
-    audioEngine.setupAudioStream(sampleRate: sampleRate, channelCount: Int(channelCount))
+  @objc public func setupAudioStream(sampleRate: Double, channelCount: Double) -> String? {
+    do {
+      try audioEngine.setupAudioStream(sampleRate: sampleRate, channelCount: Int(channelCount))
+      return nil
+    } catch let error as AudioEngineError {
+      return error.localizedDescription
+    } catch {
+      return Self.unknownError
+    }
   }
 
-  @objc public func openAudioStream() {
-    audioEngine.openAudioStream()
+  @objc public func openAudioStream() -> String? {
+    do {
+      try audioEngine.openAudioStream()
+      return nil
+    } catch let error as AudioEngineError {
+      return error.localizedDescription
+    } catch {
+      return Self.unknownError
+    }
   }
 
   @objc public func loopSounds(arg: NSArray) {
@@ -24,50 +40,73 @@ import AudioToolbox
     audioEngine.seekSoundsTo(convertNSArrayToArrayOfStringDoubleTuples(arg))
   }
 
-  @objc public func loadSound(uri: String, completion: @escaping (String?) -> Void) {
+  @objc public func loadSound(uri: String, completion: @escaping (_ id:String?, _ error: String?) -> Void) {
     let isLocalFile = uri.hasPrefix("file://")
     let url = URL(string: uri)
 
     guard let url else {
-      completion(nil)
+      completion(nil, "Invalid Uri: \(uri)")
       return
     }
 
+    let cb = {(_ localFileUrl: URL) in
+      do {
+        let id = try self.audioEngine.loadAudioWith(localFileUrl: localFileUrl)
+        completion(id, nil)
+      } catch let error as AudioEngineError {
+        completion(nil, error.localizedDescription)
+      } catch {
+        completion(nil, Self.unknownError)
+      }
+    }
+
     if isLocalFile {
-      completion(self.audioEngine.loadAudioWith(localFileUrl: url))
+      cb(url)
     } else {
-      loadRemoteSound(url: url) { [weak self] localUrl in
-        guard let self, let localUrl else {
-          completion(nil)
+      loadRemoteSound(url: url) {  localUrl, error in
+        guard  let localUrl else {
+          completion(nil, error)
           return
         }
 
-        completion(self.audioEngine.loadAudioWith(localFileUrl: localUrl))
+        cb(localUrl)
       }
     }
   }
 
-  @objc public func unloadSound(id: String) {
-    audioEngine.unloadSound(id: id)
+  @objc public func unloadSound(id: String) -> String? {
+    do {
+      try audioEngine.unloadSound(id: id)
+      return nil
+    } catch let error as AudioEngineError {
+      return error.localizedDescription
+    } catch {
+      return Self.unknownError
+    }
   }
 
-  @objc public func closeAudioStream() {
-    audioEngine.closeAudioStream()
+  @objc public func closeAudioStream() -> String? {
+    do {
+      try audioEngine.closeAudioStream()
+      return nil
+    } catch let error as AudioEngineError {
+      return error.localizedDescription
+    } catch {
+      return Self.unknownError
+    }
   }
 
-  private func loadRemoteSound(url: URL, _ completion: @escaping (URL?) -> Void) {
+  private func loadRemoteSound(url: URL, _ completion: @escaping (_ url: URL?,_ error: String?) -> Void) {
     URLSession.shared.downloadTask(with: url) { localUrl, response, error in
       if let error {
-        print("Downloading local file failed: \(error)")
-        completion(nil)
+        completion(nil, "Downloading local file failed: \(error.localizedDescription)")
         return
       }
 
       if let localUrl {
-        completion(localUrl)
+        completion(localUrl, nil)
       } else {
-        print("Downloaded file is nil with no error")
-        completion(nil)
+        completion(nil, Self.unknownError)
       }
     }.resume()
   }
