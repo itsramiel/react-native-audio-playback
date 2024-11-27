@@ -115,6 +115,16 @@ void AudioEngine::seekSoundsTo(const std::vector<std::pair<std::string, double>>
     }
 }
 
+void AudioEngine::setSoundsVolume(const std::vector<std::pair<std::string, double>> & pairs) {
+    for (const auto& pair: pairs) {
+        auto it = mPlayers.find(pair.first);
+        if(it != mPlayers.end()) {
+            it->second->setVolume(static_cast<float >(pair.second));
+        }
+    }
+}
+
+
 LoadSoundResult AudioEngine::loadSound(int fd, int offset, int length) {
     auto playersSize = mPlayers.size();
 
@@ -149,4 +159,3 @@ UnloadSoundResult AudioEngine::unloadSound(const std::string &playerId) {
 
     return {.error = std::nullopt};
 }
-

@@ -40,6 +40,10 @@ import AudioToolbox
     audioEngine.seekSoundsTo(convertNSArrayToArrayOfStringDoubleTuples(arg))
   }
 
+  @objc public func setSoundsVolume(arg: NSArray) {
+    audioEngine.setSoundsVolume(convertNSArrayToArrayOfStringDoubleTuples(arg))
+  }
+
   @objc public func loadSound(uri: String, completion: @escaping (_ id:String?, _ error: String?) -> Void) {
     let isLocalFile = uri.hasPrefix("file://")
     let url = URL(string: uri)
