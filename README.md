@@ -88,9 +88,10 @@ Note: You should have called `setupAudioStream` before calling this method. You 
 - `closeAudioStream(): void`: Closes the audio stream
 Note: After this, you need to resetup the audio stream and then repon it to play sounds. The loaded sounds are still loaded and you dont have to reload them.
 - `loadSound(requiredAsset: number): Player`: Loads a local audio sound and returns a `Player` instance
-- `playSounds(args: Array<[Player, boolean]>): void` Plays/pauses multiple sounds
-- `loopSounds(args: Array<[Player, boolean]>): void` Loops/unloops multiple sounds
-- `seekSoundsTo(args: Array<[Player, number]>): void` Seeks multiple sounds
+- `playSounds(args: ReadonlyArray<[Player, boolean]>): void` Plays/pauses multiple sounds
+- `loopSounds(args: ReadonlyArray<[Player, boolean]>): void` Loops/unloops multiple sounds
+- `seekSoundsTo(args: ReadonlyArray<[Player, number]>): void` Seeks multiple sounds
+- `public setSoundsVolume(args: ReadonlyArray<[Player, number]>): void` Sets the volume of multiple sounds, volume should be a number between 0 and 1.
 
 ### Player
 The `Player` class is used to manage a single sound created by an `AudioManager`.
@@ -99,6 +100,7 @@ The `Player` class is used to manage a single sound created by an `AudioManager`
 - `playSound(): void`: Plays the sound. If the sound is already playing it does nothing. If the sound is paused, it resumes it.
 - `pauseSound(): void`: Pauses the sound
 - `seekTo(timeInMs: number): void`: Seeks the sound to a given time in Milliseconds
+- `setVolume(volume: number): void`: Sets the volume of the sound, volume should be a number between 0 and 1.
 - `unloadSound(): void`: Unloads the audio memory, so the Player is useless after this point.
 
 ## Sample Rates and Channel Counts
