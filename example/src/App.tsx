@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
-import { StyleSheet, View, Text, ScrollView, SafeAreaView } from 'react-native';
 import { Player, AudioManager } from 'react-native-audio-playback';
+import { StyleSheet, View, Text, ScrollView, SafeAreaView } from 'react-native';
+
 import { Button, VolumeSlider } from './components';
 
 export default function App() {

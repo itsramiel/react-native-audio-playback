@@ -102,6 +102,24 @@ Java_com_audioplayback_AudioPlaybackModule_openAudioStreamNative(JNIEnv *env, jo
 }
 
 JNIEXPORT jobject JNICALL
+Java_com_audioplayback_AudioPlaybackModule_pauseAudioStreamNative(JNIEnv *env, jobject thiz) {
+    auto result = audioEngine->pauseAudioStream();
+
+    jclass structClass = env->FindClass("com/audioplayback/models/PauseAudioStreamResult");
+    jmethodID constructor = env->GetMethodID(structClass, "<init>", "(Ljava/lang/String;)V");
+
+    jstring jError = result.error.has_value() ? env->NewStringUTF(result.error->c_str()): nullptr;
+    jobject returnValue = env->NewObject(structClass, constructor, jError);
+
+    if(jError) {
+        env->DeleteLocalRef(jError);
+    }
+
+    return returnValue;
+}
+
+
+JNIEXPORT jobject JNICALL
 Java_com_audioplayback_AudioPlaybackModule_closeAudioStreamNative(JNIEnv *env, jobject thiz) {
     auto result = audioEngine->closeAudioStream();
 

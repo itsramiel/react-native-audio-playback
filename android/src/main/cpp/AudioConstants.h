@@ -22,6 +22,10 @@ struct OpenAudioStreamResult {
     std::optional<std::string> error;
 };
 
+struct PauseAudioStreamResult {
+    std::optional<std::string> error;
+};
+
 struct CloseAudioStreamResult {
     std::optional<std::string> error;
 };

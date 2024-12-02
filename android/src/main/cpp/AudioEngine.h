@@ -18,6 +18,7 @@ class AudioEngine : public oboe::AudioStreamDataCallback{
 public:
     SetupAudioStreamResult setupAudioStream(double sampleRate, double channelCount);
     OpenAudioStreamResult openAudioStream();
+    PauseAudioStreamResult pauseAudioStream();
     CloseAudioStreamResult closeAudioStream();
     void playSounds(const std::vector<std::pair<std::string, bool>>&);
     void loopSounds(const std::vector<std::pair<std::string, bool>>&);

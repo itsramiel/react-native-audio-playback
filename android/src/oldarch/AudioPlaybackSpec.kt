@@ -14,6 +14,8 @@ abstract class AudioPlaybackSpec internal constructor(context: ReactApplicationC
 
   abstract fun openAudioStream(): WritableMap
 
+  abstract fun pauseAudioStream(): WritableMap
+
   abstract fun closeAudioStream(): WritableMap
 
   abstract fun loopSounds(arg: ReadableArray)
