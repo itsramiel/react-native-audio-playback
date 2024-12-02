@@ -73,6 +73,12 @@ export default function App() {
             }}
           />
           <Button
+            title="Pause Stream"
+            onPress={() => {
+              AudioManager.shared.pauseAudioStream();
+            }}
+          />
+          <Button
             title="Close Stream"
             onPress={() => {
               AudioManager.shared.closeAudioStream();

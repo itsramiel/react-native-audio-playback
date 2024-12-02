@@ -3,6 +3,7 @@ import {
   loadSound,
   loopSounds,
   openAudioStream,
+  pauseAudioStream,
   playSounds,
   seekSoundsTo,
   setSoundsVolume,
@@ -24,6 +25,10 @@ export class AudioManager {
 
   public openAudioStream() {
     openAudioStream();
+  }
+
+  public pauseAudioStream() {
+    pauseAudioStream();
   }
 
   public closeAudioStream(): void {

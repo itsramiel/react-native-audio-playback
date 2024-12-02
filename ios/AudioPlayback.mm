@@ -28,6 +28,12 @@ RCT_EXPORT_SYNCHRONOUS_TYPED_METHOD(NSDictionary *, openAudioStream) {
   return @{@"error":error?: [NSNull null]};
 }
 
+RCT_EXPORT_SYNCHRONOUS_TYPED_METHOD(NSDictionary *, pauseAudioStream) {
+  NSString *error = [moduleImpl pauseAudioStream];
+
+  return @{@"error":error?: [NSNull null]};
+}
+
 RCT_EXPORT_SYNCHRONOUS_TYPED_METHOD(NSDictionary *, closeAudioStream) {
   NSString *error = [moduleImpl closeAudioStream];
 
@@ -63,9 +69,6 @@ RCT_EXPORT_METHOD(seekSoundsTo:(NSArray *)arg) {
 RCT_EXPORT_METHOD(setSoundsVolume:(NSArray *)arg) {
   [moduleImpl setSoundsVolumeWithArg:arg];
 }
-
-
-
 
 // Don't compile this code when we build for the old architecture.
 #ifdef RCT_NEW_ARCH_ENABLED

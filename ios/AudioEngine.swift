@@ -11,7 +11,7 @@ import AVFoundation
 import AudioToolbox
 
 enum AudioStreamState {
-  case initialized, opened, closed
+  case initialized, opened, closed, paused
 }
 
 enum AudioEngineError: LocalizedError {
@@ -19,6 +19,7 @@ enum AudioEngineError: LocalizedError {
   case failedToSetupAudioStream(reason: String)
   case failedToOpenAudioStream(reason: String)
   case failedToCloseAudioStream(reason: String)
+  case failedToPauseAudioStream(reason: String)
   case failedToUnloadSound
   case failedToLoadAudioFile(reason: String)
 
@@ -30,6 +31,8 @@ enum AudioEngineError: LocalizedError {
       return "Failed to setup audio stream: \(reason)"
     case .failedToOpenAudioStream(reason: let reason):
       return "Failed to open audio stream: \(reason)"
+    case .failedToPauseAudioStream(reason: let reason):
+      return "Failed to pause audio stream: \(reason)"
     case .failedToCloseAudioStream(reason: let reason):
       return "Failed to close audio stream: \(reason)"
     case .failedToUnloadSound:
@@ -157,7 +160,7 @@ class AudioEngine {
   }
 
   @objc public func openAudioStream() throws {
-    guard audioStreamState == .initialized else {
+    guard audioStreamState == .initialized || audioStreamState == .paused else {
       throw AudioEngineError.failedToOpenAudioStream(reason: "Stream is not initialized")
     }
 
@@ -276,6 +279,23 @@ class AudioEngine {
       guard let player = players[id] else { continue }
       player.setVolume(Float(volume))
     }
+  }
+
+  public func pauseAudioStream() throws {
+    guard let audioUnit else {
+      throw AudioEngineError.failedToPauseAudioStream(reason: "No stream to pause found.")
+    }
+
+    guard audioStreamState != .paused else {
+      throw AudioEngineError.failedToPauseAudioStream(reason: "Stream is already paused.")
+    }
+
+    var status = AudioOutputUnitStop(audioUnit)
+    if(status != noErr) {
+      throw AudioEngineError.failedToCloseAudioStream(reason: "Failed to pause audio stream.")
+    }
+
+    self.audioStreamState = .paused
   }
 
 
