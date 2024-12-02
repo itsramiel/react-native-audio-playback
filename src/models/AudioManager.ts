@@ -23,11 +23,11 @@ export class AudioManager {
     setupAudioStream(sampleRate, channelCount);
   }
 
-  public openAudioStream() {
+  public openAudioStream(): void {
     openAudioStream();
   }
 
-  public pauseAudioStream() {
+  public pauseAudioStream(): void {
     pauseAudioStream();
   }
 
