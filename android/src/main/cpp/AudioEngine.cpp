@@ -58,6 +58,30 @@ OpenAudioStreamResult AudioEngine::openAudioStream() {
     }
 }
 
+PauseAudioStreamResult AudioEngine::pauseAudioStream() {
+    if(!mAudioStream) {
+        return {.error = "There is no audio stream to pause" };
+    }
+    auto streamState = mAudioStream->getState();
+
+    if(streamState == oboe::StreamState::Pausing || streamState == oboe::StreamState::Paused) {
+        return {.error = "Audio stream was requested to pause but it is already paused"};
+    }
+
+    if(streamState != oboe::StreamState::Starting && streamState != oboe::StreamState::Started) {
+        return {.error = "Cannot pause a not started stream"};
+    }
+
+    oboe::Result result = mAudioStream->requestPause();
+    if(result != oboe::Result::OK) {
+        auto error = "Failed to pause stream, Error: %s" + std::string(oboe::convertToText(result));
+        return {.error = error};
+    } else {
+        return {.error = std::nullopt};
+    }
+}
+
+
 CloseAudioStreamResult AudioEngine::closeAudioStream() {
     if(!mAudioStream) {
         return { .error = "There is no audio stream to close" };

@@ -10,6 +10,7 @@ import com.facebook.react.bridge.ReadableType
 import com.audioplayback.models.FileDescriptorProps
 import com.audioplayback.models.LoadSoundResult
 import com.audioplayback.models.OpenAudioStreamResult
+import com.audioplayback.models.PauseAudioStreamResult
 import com.audioplayback.models.SetupAudioStreamResult
 import com.audioplayback.models.UnloadSoundResult
 import com.facebook.react.bridge.Arguments
@@ -43,6 +44,15 @@ class AudioPlaybackModule internal constructor(context: ReactApplicationContext)
     result.error?.let { map.putString("error", it) } ?: map.putNull("error")
     return map
   }
+
+  @ReactMethod(isBlockingSynchronousMethod = true)
+  override fun pauseAudioStream(): WritableMap {
+    val result = pauseAudioStreamNative()
+    val map = Arguments.createMap()
+    result.error?.let { map.putString("error", it) } ?: map.putNull("error")
+    return map
+  }
+
 
   @ReactMethod(isBlockingSynchronousMethod = true)
   override fun closeAudioStream(): WritableMap {
@@ -180,6 +190,7 @@ class AudioPlaybackModule internal constructor(context: ReactApplicationContext)
 
   private external fun setupAudioStreamNative(sampleRate: Double, channelCount: Double): SetupAudioStreamResult
   private external fun openAudioStreamNative(): OpenAudioStreamResult
+  private external fun pauseAudioStreamNative(): PauseAudioStreamResult
   private external fun closeAudioStreamNative(): CloseAudioStreamResult
   private external fun playSoundsNative(ids: Array<String>, values: BooleanArray)
   private external fun loopSoundsNative(ids: Array<String>, values: BooleanArray)

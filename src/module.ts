@@ -42,6 +42,13 @@ export function openAudioStream(): void {
   }
 }
 
+export function pauseAudioStream(): void {
+  const res = AudioPlayback.pauseAudioStream();
+  if (res.error) {
+    throw new Error(res.error);
+  }
+}
+
 export function closeAudioStream(): void {
   const res = AudioPlayback.closeAudioStream();
   if (res.error) {

@@ -7,6 +7,7 @@ export interface Spec extends TurboModule {
     channelCount: number
   ) => { error: string | null };
   openAudioStream: () => { error: string | null };
+  pauseAudioStream: () => { error: string | null };
   closeAudioStream: () => { error: string | null };
   loopSounds: (arg: Array<[string, boolean]>) => void;
   playSounds: (arg: Array<[string, boolean]>) => void;

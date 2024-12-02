@@ -85,6 +85,8 @@ AudioManager.shared.<some-method>
 Note: You shouldn't setup multiple streams simultaneously because you only need one stream. Trying to setup another one will simply fails because there is already one setup.
 - `openAudioStream(): void`: Opens the audio stream to allow audio to be played
 Note: You should have called `setupAudioStream` before calling this method. You can't open a stream that hasn't been setup
+- `pauseAudioStream(): void`: Pauses the audio stream (An example of when to use this is when user puts app to background)
+Note: The stream has to be in open state. You cant pause a non open stream
 - `closeAudioStream(): void`: Closes the audio stream
 Note: After this, you need to resetup the audio stream and then repon it to play sounds. The loaded sounds are still loaded and you dont have to reload them.
 - `loadSound(requiredAsset: number): Player`: Loads a local audio sound and returns a `Player` instance

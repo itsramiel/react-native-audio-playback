@@ -89,6 +89,17 @@ import AudioToolbox
     }
   }
 
+  @objc public func pauseAudioStream() -> String? {
+    do {
+      try audioEngine.pauseAudioStream()
+      return nil
+    } catch let error as AudioEngineError {
+      return error.localizedDescription
+    } catch {
+      return Self.unknownError
+    }
+  }
+
   @objc public func closeAudioStream() -> String? {
     do {
       try audioEngine.closeAudioStream()
