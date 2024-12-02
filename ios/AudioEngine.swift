@@ -290,7 +290,11 @@ class AudioEngine {
       throw AudioEngineError.failedToPauseAudioStream(reason: "Stream is already paused.")
     }
 
-    var status = AudioOutputUnitStop(audioUnit)
+    guard audioStreamState == .opened else {
+      throw AudioEngineError.failedToPauseAudioStream(reason: "Cannot pause a non started stream.")
+    }
+
+    let status = AudioOutputUnitStop(audioUnit)
     if(status != noErr) {
       throw AudioEngineError.failedToCloseAudioStream(reason: "Failed to pause audio stream.")
     }
