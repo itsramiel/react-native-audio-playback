@@ -77,6 +77,8 @@ std::vector<std::string> jniStringArrayToStringVector(JNIEnv* env, jobjectArray 
         env->ReleaseStringUTFChars(javaString, chars);
         env->DeleteLocalRef(javaString);
     }
+
+    return cppVector;
 }
 
 extern "C" {
@@ -148,24 +150,6 @@ Java_com_audioplayback_AudioPlaybackModule_closeAudioStreamNative(JNIEnv *env, j
 
     return returnValue;
 }
-
-JNIEXPORT jobject JNICALL
-Java_com_audioplayback_AudioPlaybackModule_unloadSoundNative(JNIEnv *env, jobject instance, jstring playerId) {
-    auto result = audioEngine->unloadSound(jstringToStdString(env, playerId));
-
-    jclass structClass = env->FindClass("com/audioplayback/models/UnloadSoundResult");
-    jmethodID constructor = env->GetMethodID(structClass, "<init>", "(Ljava/lang/String;)V");
-
-    jstring jError = result.error.has_value() ? env->NewStringUTF(result.error->c_str()): nullptr;
-    jobject returnValue = env->NewObject(structClass, constructor, jError);
-
-    if(jError) {
-        env->DeleteLocalRef(jError);
-    }
-
-    return returnValue;
-}
-
 
 JNIEXPORT void JNICALL
 Java_com_audioplayback_AudioPlaybackModule_unloadSoundsNative(JNIEnv *env, jobject thiz,

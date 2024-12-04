@@ -12,7 +12,6 @@ import com.audioplayback.models.LoadSoundResult
 import com.audioplayback.models.OpenAudioStreamResult
 import com.audioplayback.models.PauseAudioStreamResult
 import com.audioplayback.models.SetupAudioStreamResult
-import com.audioplayback.models.UnloadSoundResult
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.WritableMap
 import kotlinx.coroutines.CoroutineScope
@@ -88,12 +87,9 @@ class AudioPlaybackModule internal constructor(context: ReactApplicationContext)
   }
 
 
-  @ReactMethod(isBlockingSynchronousMethod = true)
-  override fun unloadSound(id: String): WritableMap {
-    val result = unloadSoundNative(id)
-    val map = Arguments.createMap()
-    result.error?.let { map.putString("error", it) } ?: map.putNull("error")
-    return map
+  @ReactMethod
+  override fun unloadSound(id: String) {
+    unloadSoundsNative(arrayOf(id))
   }
 
   @ReactMethod
@@ -198,7 +194,6 @@ class AudioPlaybackModule internal constructor(context: ReactApplicationContext)
   private external fun seekSoundsToNative(ids: Array<String>, values: DoubleArray)
   private external fun setSoundsVolumeNative(ids: Array<String>, values: DoubleArray)
   private external fun loadSoundNative(fd: Int, fileLength: Int, fileOffset: Int): LoadSoundResult
-  private external fun unloadSoundNative(playerId: String): UnloadSoundResult
   private external fun unloadSoundsNative(ids: Array<String>?)
 
   // Example method

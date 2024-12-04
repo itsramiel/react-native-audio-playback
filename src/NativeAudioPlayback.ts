@@ -13,7 +13,7 @@ export interface Spec extends TurboModule {
   playSounds: (arg: Array<[string, boolean]>) => void;
   seekSoundsTo: (arg: Array<[string, number]>) => void;
   setSoundsVolume: (arg: Array<[string, number]>) => void;
-  unloadSound: (id: string) => { error: string | null };
+  unloadSound: (id: string) => void;
   loadSound: (
     uri: string
   ) => Promise<{ id: string | null; error: string | null }>;

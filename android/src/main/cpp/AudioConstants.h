@@ -35,8 +35,4 @@ struct LoadSoundResult {
     std::optional<std::string> error;
 };
 
-struct UnloadSoundResult {
-    std::optional<std::string> error;
-};
-
 #endif //AUDIOPLAYBACK_AUDIOCONSTANTS_H

@@ -1242,7 +1242,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - react-native-audio-playback (0.2.0-alpha.4):
+  - react-native-audio-playback (1.0.0):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1818,7 +1818,7 @@ SPEC CHECKSUMS:
   React-logger: addd140841248966c2547eb94836399cc1061f4d
   React-Mapbuffer: 029b5332e78af8c67c4b5e65edfc717068b8eac1
   React-microtasksnativemodule: f30949ee318ba90b9668de1e325b98838b9a4da2
-  react-native-audio-playback: 9928a4f29998a3d98f1ee63e8054bf23c97ff86b
+  react-native-audio-playback: 2e227d97930550dc443ae76be9a07b25f51c469e
   react-native-slider: d1a9121980fc81678c6d30b82f312c778fba563c
   React-nativeconfig: 470fce6d871c02dc5eff250a362d56391b7f52d6
   React-NativeModulesApple: 1586448c61a7c2bd4040cc03ccde66a72037e77e

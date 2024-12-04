@@ -173,17 +173,6 @@ LoadSoundResult AudioEngine::loadSound(int fd, int offset, int length) {
     return {.id = id, .error = std::nullopt};
 }
 
-UnloadSoundResult AudioEngine::unloadSound(const std::string &playerId) {
-    auto it = mPlayers.find(playerId);
-    if(it != mPlayers.end()) {
-        mPlayers.erase(it);
-    } else {
-        return {.error = "Audio file could not be unloaded because it is not found"};
-    }
-
-    return {.error = std::nullopt};
-}
-
 void AudioEngine::unloadSounds(const std::optional<std::vector<std::string>> &ids)  {
     if(ids.has_value()) {
         for (const auto & id: ids.value()) {
