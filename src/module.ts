@@ -93,8 +93,5 @@ export async function loadSound(requiredAsset: number): Promise<string> {
 }
 
 export function unloadSound(playerId: string) {
-  const res = AudioPlayback.unloadSound(playerId);
-  if (res.error) {
-    throw new Error(res.error);
-  }
+  AudioPlayback.unloadSound(playerId);
 }

@@ -66,6 +66,21 @@ std::string jstringToStdString(JNIEnv* env, jstring jStr) {
     return str;
 }
 
+std::vector<std::string> jniStringArrayToStringVector(JNIEnv* env, jobjectArray stringArray) {
+    std::vector<std::string> cppVector{};
+    jsize length = env->GetArrayLength(stringArray);
+
+    for(jsize i = 0; i < length; ++i) {
+        auto javaString = (jstring)env->GetObjectArrayElement(stringArray, i);
+        const char* chars = env->GetStringUTFChars(javaString, nullptr);
+        cppVector.emplace_back(chars);
+        env->ReleaseStringUTFChars(javaString, chars);
+        env->DeleteLocalRef(javaString);
+    }
+
+    return cppVector;
+}
+
 extern "C" {
 JNIEXPORT jobject JNICALL
 Java_com_audioplayback_AudioPlaybackModule_setupAudioStreamNative(JNIEnv *env, jobject thiz, jdouble sample_rate, jdouble channel_count) {
@@ -136,21 +151,14 @@ Java_com_audioplayback_AudioPlaybackModule_closeAudioStreamNative(JNIEnv *env, j
     return returnValue;
 }
 
-JNIEXPORT jobject JNICALL
-Java_com_audioplayback_AudioPlaybackModule_unloadSoundNative(JNIEnv *env, jobject instance, jstring playerId) {
-    auto result = audioEngine->unloadSound(jstringToStdString(env, playerId));
-
-    jclass structClass = env->FindClass("com/audioplayback/models/UnloadSoundResult");
-    jmethodID constructor = env->GetMethodID(structClass, "<init>", "(Ljava/lang/String;)V");
-
-    jstring jError = result.error.has_value() ? env->NewStringUTF(result.error->c_str()): nullptr;
-    jobject returnValue = env->NewObject(structClass, constructor, jError);
-
-    if(jError) {
-        env->DeleteLocalRef(jError);
+JNIEXPORT void JNICALL
+Java_com_audioplayback_AudioPlaybackModule_unloadSoundsNative(JNIEnv *env, jobject thiz,
+                                                              jobjectArray ids) {
+    if(ids == nullptr) {
+        audioEngine->unloadSounds(std::nullopt);
+    } else {
+        audioEngine->unloadSounds(jniStringArrayToStringVector(env, ids));
     }
-
-    return returnValue;
 }
 
 

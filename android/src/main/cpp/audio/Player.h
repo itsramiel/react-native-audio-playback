@@ -35,9 +35,7 @@ class Player : public IRenderableAudio{
 
 public:
     /**
-     * Construct a new Player from the given DataSource. Players can share the same data source.
-     * For example, you could play two identical sounds concurrently by creating 2 Players with the
-     * same data source.
+     * Construct a new Player from the given DataSource.
      *
      * @param source
      */
