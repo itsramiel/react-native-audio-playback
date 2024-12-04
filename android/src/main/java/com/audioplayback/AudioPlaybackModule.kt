@@ -186,6 +186,7 @@ class AudioPlaybackModule internal constructor(context: ReactApplicationContext)
   override fun invalidate() {
     super.invalidate()
     closeAudioStreamNative()
+    unloadSoundsNative(null)
   }
 
   private external fun setupAudioStreamNative(sampleRate: Double, channelCount: Double): SetupAudioStreamResult
@@ -198,6 +199,7 @@ class AudioPlaybackModule internal constructor(context: ReactApplicationContext)
   private external fun setSoundsVolumeNative(ids: Array<String>, values: DoubleArray)
   private external fun loadSoundNative(fd: Int, fileLength: Int, fileOffset: Int): LoadSoundResult
   private external fun unloadSoundNative(playerId: String): UnloadSoundResult
+  private external fun unloadSoundsNative(ids: Array<String>?)
 
   // Example method
   // See https://reactnative.dev/docs/native-modules-android

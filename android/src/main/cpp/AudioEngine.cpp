@@ -183,3 +183,16 @@ UnloadSoundResult AudioEngine::unloadSound(const std::string &playerId) {
 
     return {.error = std::nullopt};
 }
+
+void AudioEngine::unloadSounds(const std::optional<std::vector<std::string>> &ids)  {
+    if(ids.has_value()) {
+        for (const auto & id: ids.value()) {
+            auto player = mPlayers.find(id);
+            if(player != mPlayers.end()) {
+                mPlayers.erase(player);
+            }
+        }
+    } else {
+        mPlayers.clear();
+    }
+}

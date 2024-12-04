@@ -26,6 +26,7 @@ public:
     void setSoundsVolume(const std::vector<std::pair<std::string, double>>&);
     LoadSoundResult loadSound(int fd, int offset, int length);
     UnloadSoundResult unloadSound(const std::string &playerId);
+    void unloadSounds(const std::optional<std::vector<std::string>>&);
 
     oboe::DataCallbackResult onAudioReady(oboe::AudioStream *oboeStream, void *audioData, int32_t numFrames) override;
 

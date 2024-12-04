@@ -66,6 +66,19 @@ std::string jstringToStdString(JNIEnv* env, jstring jStr) {
     return str;
 }
 
+std::vector<std::string> jniStringArrayToStringVector(JNIEnv* env, jobjectArray stringArray) {
+    std::vector<std::string> cppVector{};
+    jsize length = env->GetArrayLength(stringArray);
+
+    for(jsize i = 0; i < length; ++i) {
+        auto javaString = (jstring)env->GetObjectArrayElement(stringArray, i);
+        const char* chars = env->GetStringUTFChars(javaString, nullptr);
+        cppVector.emplace_back(chars);
+        env->ReleaseStringUTFChars(javaString, chars);
+        env->DeleteLocalRef(javaString);
+    }
+}
+
 extern "C" {
 JNIEXPORT jobject JNICALL
 Java_com_audioplayback_AudioPlaybackModule_setupAudioStreamNative(JNIEnv *env, jobject thiz, jdouble sample_rate, jdouble channel_count) {
@@ -151,6 +164,17 @@ Java_com_audioplayback_AudioPlaybackModule_unloadSoundNative(JNIEnv *env, jobjec
     }
 
     return returnValue;
+}
+
+
+JNIEXPORT void JNICALL
+Java_com_audioplayback_AudioPlaybackModule_unloadSoundsNative(JNIEnv *env, jobject thiz,
+                                                              jobjectArray ids) {
+    if(ids == nullptr) {
+        audioEngine->unloadSounds(std::nullopt);
+    } else {
+        audioEngine->unloadSounds(jniStringArrayToStringVector(env, ids));
+    }
 }
 
 
