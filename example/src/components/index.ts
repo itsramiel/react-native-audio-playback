@@ -1,3 +1,4 @@
 export * from './Button';
-export * from './InputButton';
-export * from './VolumeSlider';
+export * from './Section';
+export * from './PlayerControl';
+export * from './StreamControl';
