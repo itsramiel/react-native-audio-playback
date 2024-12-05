@@ -1,6 +1,6 @@
 import { StyleSheet, View } from 'react-native';
 import Slider from '@react-native-community/slider';
-import { type Player } from 'react-native-audio-playback';
+import { AudioManager, type Player } from 'react-native-audio-playback';
 
 import { Button } from './Button';
 import { Section } from './Section';
@@ -14,28 +14,42 @@ export function MultiPlayersControl({
   playerObjects,
   onPlayerPress,
 }: MultiPlayersControlProps) {
+  const selectedPlayers = playerObjects.filter((p) => p.selected);
+
   function onPlay() {
-    // Todo
+    AudioManager.shared.playSounds(
+      selectedPlayers.map((p) => [p.player, true] as const)
+    );
   }
 
   function onPause() {
-    // Todo
+    AudioManager.shared.playSounds(
+      selectedPlayers.map((p) => [p.player, false] as const)
+    );
   }
 
   function onSeekToStart() {
-    // Todo
+    AudioManager.shared.seekSoundsTo(
+      selectedPlayers.map((p) => [p.player, 0] as const)
+    );
   }
 
   function onLoop() {
-    // Todo
+    AudioManager.shared.loopSounds(
+      selectedPlayers.map((p) => [p.player, true] as const)
+    );
   }
 
   function onUnloop() {
-    // Todo
+    AudioManager.shared.loopSounds(
+      selectedPlayers.map((p) => [p.player, false] as const)
+    );
   }
 
   function onVolumeChange(value: number) {
-    // Todo
+    AudioManager.shared.setSoundsVolume(
+      selectedPlayers.map((p) => [p.player, value] as const)
+    );
   }
 
   return (

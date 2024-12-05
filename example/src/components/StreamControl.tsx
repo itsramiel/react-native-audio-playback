@@ -1,3 +1,4 @@
+import { AudioManager } from 'react-native-audio-playback';
 import { Button } from './Button';
 import { Section } from './Section';
 
@@ -7,19 +8,19 @@ interface StreamControlProps {
 
 export function StreamControl({ onLoadSounds }: StreamControlProps) {
   function onSetupStream() {
-    // Todo
+    AudioManager.shared.setupAudioStream();
   }
 
   function onOpenStream() {
-    // Todo
+    AudioManager.shared.openAudioStream();
   }
 
   function onPauseStream() {
-    // Todo
+    AudioManager.shared.pauseAudioStream();
   }
 
   function onCloseStream() {
-    // Todo
+    AudioManager.shared.closeAudioStream();
   }
 
   return (

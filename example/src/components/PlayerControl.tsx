@@ -12,27 +12,27 @@ interface PlayerControlProps {
 
 export function PlayerControl({ player, title }: PlayerControlProps) {
   function onPlay() {
-    // Todo
+    player.playSound();
   }
 
   function onPause() {
-    // Todo
+    player.pauseSound();
   }
 
   function onSeekToStart() {
-    // Todo
+    player.seekTo(0);
   }
 
   function onLoop() {
-    // Todo
+    player.loopSound(true);
   }
 
   function onUnloop() {
-    // Todo
+    player.loopSound(false);
   }
 
   function onVolumeChange(value: number) {
-    // Todo
+    player.setVolume(value);
   }
 
   return (
