@@ -15,7 +15,7 @@ export default function App() {
           <PlayerControl player={player} title={title} key={player.id} />
         ))}
         <MultiPlayersControl
-          players={playerObjects}
+          playerObjects={playerObjects}
           onPlayerPress={onPlayerPressed}
         />
       </ScrollView>

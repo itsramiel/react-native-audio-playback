@@ -12,34 +12,34 @@ interface PlayerControlProps {
 
 export function PlayerControl({ player, title }: PlayerControlProps) {
   function onPlay() {
-    player.playSound();
+    // Todo
   }
 
   function onPause() {
-    player.pauseSound();
+    // Todo
   }
 
-  function onSeekTo() {
-    player.seekTo(5000);
+  function onSeekToStart() {
+    // Todo
   }
 
   function onLoop() {
-    player.loopSound(true);
+    // Todo
   }
 
   function onUnloop() {
-    player.loopSound(false);
+    // Todo
   }
 
   function onVolumeChange(value: number) {
-    player.setVolume(value);
+    // Todo
   }
 
   return (
     <Section title={title}>
       <Button title="Play" onPress={onPlay} />
       <Button title="Pause" onPress={onPause} />
-      <Button title="Seek To Start" onPress={onSeekTo} />
+      <Button title="Seek To Start" onPress={onSeekToStart} />
       <Button title="loop" onPress={onLoop} />
       <Button title="unloop" onPress={onUnloop} />
       <Slider
