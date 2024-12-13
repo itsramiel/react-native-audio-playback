@@ -1,6 +1,10 @@
 #import "AudioPlayback.h"
 
+#if __has_include("react_native_audio_playback-Swift.h")
 #import "react_native_audio_playback-Swift.h"
+#else
+#import "react_native_audio_playback/react_native_audio_playback-Swift.h"
+#endif
 
 @implementation AudioPlayback {
   AudioPlaybackImpl *moduleImpl;
