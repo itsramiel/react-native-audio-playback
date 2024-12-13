@@ -9,14 +9,18 @@ For iOS, it uses [Core Audio](https://developer.apple.com/library/archive/docume
 ## Installation
 
 npm:
+
 ```sh
 npm install react-native-audio-playback
 ```
 
 yarn:
+
 ```sh
 yarn add react-native-audio-playback
 ```
+
+For iOS, run `pod install` in the `ios` directory.
 
 ## Usage
 
@@ -27,14 +31,14 @@ yarn add react-native-audio-playback
 ```ts
 import { AudioManager } from 'react-native-audio-playback';
 
-AudioManager.shared.setupAudioStream(44100, 2)
+AudioManager.shared.setupAudioStream(44100, 2);
 ```
 
 2. Load in your audio sounds as such:
 
 ```ts
-AudioManager.shared.loadSound(require('./assets/sound1.wav'))
-AudioManager.shared.loadSound(require('./assets/sound2.wav'))
+AudioManager.shared.loadSound(require('./assets/sound1.wav'));
+AudioManager.shared.loadSound(require('./assets/sound2.wav'));
 ```
 
 3. Open the audio stream from the audo manager:
@@ -49,20 +53,31 @@ From here you can manipulate the sounds individually:
 player1.loopSound(true); // boolean whether to loop or not
 player1.playSound();
 player1.pauseSound();
-player1.seekTo(1000) // timeInMs
+player1.seekTo(1000); // timeInMs
 ```
 
 or you can manipulate the same property for different sounds at once:
+
 ```ts
 // multi play
-AudioManager.shared.playSounds([[player1, true], [player2, true]]);
-AudioManager.shared.playSounds([[player1, true], [player2, false]]); // you can play a sound while pausing the other
+AudioManager.shared.playSounds([
+  [player1, true],
+  [player2, true],
+]);
+AudioManager.shared.playSounds([
+  [player1, true],
+  [player2, false],
+]); // you can play a sound while pausing the other
 
 // multi loop
-AudioManager.shared.loopSounds([[player1, true], [player2, true]]);
+AudioManager.shared.loopSounds([
+  [player1, true],
+  [player2, true],
+]);
 ```
 
 Unload the sounds when you no longer need them:
+
 ```ts
 player1.unloadSound();
 player2.unloadSound();
@@ -82,13 +97,13 @@ AudioManager.shared.<some-method>
 #### Methods:
 
 - `setupAudioStream(sampleRate: number = 44100, channelCount: number = 2): void`: sets up the Audio Stream to allow it later be opened.
-Note: You shouldn't setup multiple streams simultaneously because you only need one stream. Trying to setup another one will simply fails because there is already one setup.
+  Note: You shouldn't setup multiple streams simultaneously because you only need one stream. Trying to setup another one will simply fails because there is already one setup.
 - `openAudioStream(): void`: Opens the audio stream to allow audio to be played
-Note: You should have called `setupAudioStream` before calling this method. You can't open a stream that hasn't been setup
+  Note: You should have called `setupAudioStream` before calling this method. You can't open a stream that hasn't been setup
 - `pauseAudioStream(): void`: Pauses the audio stream (An example of when to use this is when user puts app to background)
-Note: The stream has to be in open state. You cant pause a non open stream
+  Note: The stream has to be in open state. You cant pause a non open stream
 - `closeAudioStream(): void`: Closes the audio stream
-Note: After this, you need to resetup the audio stream and then repon it to play sounds. The loaded sounds are still loaded and you dont have to reload them.
+  Note: After this, you need to resetup the audio stream and then repon it to play sounds. The loaded sounds are still loaded and you dont have to reload them.
 - `loadSound(requiredAsset: number): Player`: Loads a local audio sound and returns a `Player` instance
 - `playSounds(args: ReadonlyArray<[Player, boolean]>): void` Plays/pauses multiple sounds
 - `loopSounds(args: ReadonlyArray<[Player, boolean]>): void` Loops/unloops multiple sounds
@@ -96,9 +111,11 @@ Note: After this, you need to resetup the audio stream and then repon it to play
 - `public setSoundsVolume(args: ReadonlyArray<[Player, number]>): void` Sets the volume of multiple sounds, volume should be a number between 0 and 1.
 
 ### Player
+
 The `Player` class is used to manage a single sound created by an `AudioManager`.
 
 #### Methods:
+
 - `playSound(): void`: Plays the sound. If the sound is already playing it does nothing. If the sound is paused, it resumes it.
 - `pauseSound(): void`: Pauses the sound
 - `seekTo(timeInMs: number): void`: Seeks the sound to a given time in Milliseconds
@@ -109,7 +126,6 @@ The `Player` class is used to manage a single sound created by an `AudioManager`
 
 If you don't know what is a `Sample Rate` or `Channel Count` and seem to be off-put bey them! **Don't be**.
 
-
 While these terms can be intimidating, it is really simple to understand enough to get this library working.
 
 ### Sample Rate:
@@ -119,7 +135,9 @@ You most likely will work with audio files of sample rate of `44100` or `48000`.
 ```sh
 ffprobe -v error -select_streams a:0 -show_entries stream=sample_rate -of default=noprint_wrappers=1:nokey=1 <your-audio-file>.<ext>
 ```
+
 If your audio files are of different sample rates, you can easily convert them to have them all be the same sample rate. My recommendation is convert the higher sample rates to the lower ones. So convert your 48000s to 44100s like this:
+
 ```sh
 ffmpeg -i <your-audio-file>.ext -ar 44100 <new-name-for-converted-file>.<ext>
 ```
@@ -129,15 +147,16 @@ ffmpeg -i <your-audio-file>.ext -ar 44100 <new-name-for-converted-file>.<ext>
 The most commont channel counts used for mobile is `mono`,1, or `stereo`, 2. In my opinion, most of the times you want to go with 2.
 
 To know how many channels your audio file has:
+
 ```sh
 ffprobe -v error -select_streams a:0 -show_entries stream=channels -of default=noprint_wrappers=1:nokey=1 <your-audio-file>.<ext>
 ```
+
 If your audio files are of different channel counts, you can easily convert them to have them all be the same channel count. My recommendation is convert all the audio files with 1 channel to 2 channels like this:
+
 ```sh
 ffmpeg -i <your-audio-file>.<ext> -ac 2 <new-name-for-converted-file>.<ext>
 ```
-
-
 
 ## Contributing
 
