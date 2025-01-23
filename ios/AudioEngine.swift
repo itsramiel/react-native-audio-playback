@@ -14,6 +14,10 @@ enum AudioStreamState {
   case initialized, opened, closed, paused
 }
 
+struct InterruptionState {
+  let wasOpen: Bool
+}
+
 enum AudioEngineError: LocalizedError {
   case audioStreamAlreadyInitialized
   case failedToSetupAudioStream(reason: String)
@@ -52,12 +56,49 @@ class AudioEngine {
   private var audioUnit: AudioUnit?
   private var players = [String: Player]()
   private var audioStreamState: AudioStreamState = .closed
+  private var interruptionState: InterruptionState?
 
   init() {
     // configure Audio Session
     let audioSession = AVAudioSession.sharedInstance()
     try? audioSession.setCategory(.playback)
     try? audioSession.setActive(true)
+
+    NotificationCenter.default.addObserver(
+      self,
+      selector: #selector(handleAudioSessionInterruption),
+      name: AVAudioSession.interruptionNotification,
+      object: nil
+    )
+  }
+
+  @objc private func handleAudioSessionInterruption(notification: Notification) {
+    guard let userInfo = notification.userInfo,
+          let typeValue = userInfo[AVAudioSessionInterruptionTypeKey] as? UInt,
+          let type = AVAudioSession.InterruptionType(rawValue: typeValue) else {
+      return
+    }
+
+    switch type {
+    case .began:
+      let isOpen = audioStreamState == .opened
+      if isOpen {
+        try? pauseAudioStream()
+      }
+      self.interruptionState = .init(wasOpen: isOpen)
+    case .ended:
+      guard let optionsValue = userInfo[AVAudioSessionInterruptionOptionKey] as? UInt, let interruptionState else { return }
+      let options = AVAudioSession.InterruptionOptions(rawValue: optionsValue)
+      if options.contains(.shouldResume)
+          && audioStreamState != .closed
+          && interruptionState.wasOpen {
+        try? openAudioStream()
+      }
+
+      self.interruptionState = nil
+    @unknown default:
+      break
+    }
   }
 
   public func setupAudioStream(sampleRate: Double, channelCount: Int) throws {
@@ -145,7 +186,6 @@ class AudioEngine {
 
     let audioPlayer = Unmanaged<AudioEngine>.fromOpaque(inRefCon).takeUnretainedValue()
     guard let outputBuffer = ioData?.pointee.mBuffers.mData?.assumingMemoryBound(to: Float32.self) else {
-      print("Audio buffer is nil")
       return noErr
     }
 
@@ -160,6 +200,7 @@ class AudioEngine {
   }
 
   @objc public func openAudioStream() throws {
+    print(audioStreamState)
     guard audioStreamState == .initialized || audioStreamState == .paused else {
       throw AudioEngineError.failedToOpenAudioStream(reason: "Stream is not initialized")
     }
