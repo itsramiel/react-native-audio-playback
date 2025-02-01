@@ -18,7 +18,6 @@
 
 #include <cstring>
 #include <sstream>
-#include <format>
 
 #include <media/NdkMediaExtractor.h>
 #include <utils/logging.h>
