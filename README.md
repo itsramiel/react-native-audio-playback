@@ -124,9 +124,9 @@ The `Player` class is used to manage a single sound created by an `AudioManager`
 
 ## Sample Rates and Channel Counts
 
-If you don't know what is a `Sample Rate` or `Channel Count` and seem to be off-put bey them! **Don't be**.
+If you don't know what is a `Sample Rate` or `Channel Count` and seem to be off-put by them! **Don't be**.
 
-While these terms can be intimidating, it is really simple to understand enough to get this library working.
+While these terms can be intimidating, it is really simple to understand enough to get this library working. One important thing to note is that all of your audio files should be in the same sample rate and channel count.
 
 ### Sample Rate:
 
