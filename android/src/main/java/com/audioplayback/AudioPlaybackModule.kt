@@ -99,7 +99,7 @@ class AudioPlaybackModule internal constructor(context: ReactApplicationContext)
     val scheme = Uri.parse(uri).scheme
     if( scheme == null) {
       val fileDescriptorProps = FileDescriptorProps.fromLocalResource(reactApplicationContext, uri)
-      val result = loadSoundNative(fileDescriptorProps.id, fileDescriptorProps.length, fileDescriptorProps.offset);
+      val result = loadSoundNative(fileDescriptorProps.id, fileDescriptorProps.length, fileDescriptorProps.offset)
       result.error?.let { map.putString("error", it) } ?: map.putNull("error")
       result.id?.let { map.putString("id", it) } ?: map.putNull("id")
       promise.resolve(map)
@@ -113,7 +113,7 @@ class AudioPlaybackModule internal constructor(context: ReactApplicationContext)
             map.putString("error", "Failed to load sound file")
             map.putNull("id")
           } else {
-            val result = loadSoundNative(fileDescriptorProps.id, fileDescriptorProps.length, fileDescriptorProps.offset);
+            val result = loadSoundNative(fileDescriptorProps.id, fileDescriptorProps.length, fileDescriptorProps.offset)
             result.error?.let { map.putString("error", it) } ?: map.putNull("error")
             result.id?.let { map.putString("id", it) } ?: map.putNull("id")
             promise.resolve(map)
@@ -134,11 +134,11 @@ class AudioPlaybackModule internal constructor(context: ReactApplicationContext)
     for (i in 0 until arg.size()) {
       if (arg.getType(i) === ReadableType.Array) {
         // Get the nested array
-        val nestedArray = arg.getArray(i)
+        val nestedArray = arg.getArray(i)!! // Type was checked to be array so it is safe to use !!
 
         // Extract id (String) and value (Boolean)
         if (nestedArray.size() == 2) {
-          val string = nestedArray.getString(0) // First element as String
+          val string = nestedArray.getString(0)!! // First element as String
           val bool = nestedArray.getBoolean(1) // Second element as Boolean
 
           // Add to the respective arrays
@@ -162,11 +162,11 @@ class AudioPlaybackModule internal constructor(context: ReactApplicationContext)
     for (i in 0 until arg.size()) {
       if (arg.getType(i) === ReadableType.Array) {
         // Get the nested array
-        val nestedArray = arg.getArray(i)
+        val nestedArray = arg.getArray(i)!! // Type was checked to be array so it is safe to use !!
 
         // Extract id (String) and value (Boolean)
         if (nestedArray.size() == 2) {
-          val string = nestedArray.getString(0) // First element as String
+          val string = nestedArray.getString(0)!! // First element as String
           val bool = nestedArray.getDouble(1) // Second element as Boolean
 
           // Add to the respective arrays
