@@ -14,6 +14,10 @@
 #include "AudioConstants.h"
 #include <android/asset_manager.h>
 
+enum class StreamState {
+    closed, initialized, open, paused
+};
+
 class AudioEngine : public oboe::AudioStreamDataCallback{
 public:
     SetupAudioStreamResult setupAudioStream(double sampleRate, double channelCount, int usage);
@@ -26,6 +30,7 @@ public:
     void setSoundsVolume(const std::vector<std::pair<std::string, double>>&);
     LoadSoundResult loadSound(int fd, int offset, int length);
     void unloadSounds(const std::optional<std::vector<std::string>>&);
+    StreamState getStreamState();
 
     oboe::DataCallbackResult onAudioReady(oboe::AudioStream *oboeStream, void *audioData, int32_t numFrames) override;
 
@@ -35,7 +40,7 @@ private:
     int32_t mDesiredSampleRate{};
     int mDesiredChannelCount{};
 
-    oboe::Usage getUsageFromInt(int usage);
+    static oboe::Usage getUsageFromInt(int usage);
 };
 
 #endif //AUDIOPLAYBACK_AUDIOENGINE_H

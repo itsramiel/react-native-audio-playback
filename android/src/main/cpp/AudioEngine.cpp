@@ -207,3 +207,27 @@ oboe::Usage AudioEngine::getUsageFromInt(int usage) {
         default: return oboe::Usage::Media;
     }
 }
+
+StreamState AudioEngine::getStreamState() {
+    if(!mAudioStream) {
+        return StreamState::closed;
+    }
+
+    oboe::StreamState streamState = {mAudioStream->getState()};
+    switch (streamState) {
+        case oboe::StreamState::Closing:
+        case oboe::StreamState::Closed:
+        case oboe::StreamState::Disconnected:
+        case oboe::StreamState::Unknown:
+        case oboe::StreamState::Uninitialized: return StreamState::closed;
+        case oboe::StreamState::Open: return StreamState::initialized;
+        case oboe::StreamState::Starting:
+        case oboe::StreamState::Started: return StreamState::open;
+        case oboe::StreamState::Flushing:
+        case oboe::StreamState::Flushed:
+        case oboe::StreamState::Stopping:
+        case oboe::StreamState::Stopped:
+        case oboe::StreamState::Pausing:
+        case oboe::StreamState::Paused: return StreamState::paused;
+    }
+}
