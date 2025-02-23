@@ -13,6 +13,7 @@ import com.audioplayback.models.OpenAudioStreamResult
 import com.audioplayback.models.PauseAudioStreamResult
 import com.audioplayback.models.SetupAudioStreamResult
 import com.facebook.react.bridge.Arguments
+import com.facebook.react.bridge.ReadableMap
 import com.facebook.react.bridge.WritableMap
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -29,8 +30,12 @@ class AudioPlaybackModule internal constructor(context: ReactApplicationContext)
   }
 
   @ReactMethod(isBlockingSynchronousMethod = true)
-  override fun setupAudioStream(sampleRate: Double, channelCount: Double): WritableMap {
-    val result = setupAudioStreamNative(sampleRate, channelCount)
+  override fun setupAudioStream(options: ReadableMap): WritableMap {
+    val sampleRate = options.getDouble("sampleRate")
+    val channelCount = options.getDouble("channelCount")
+    val usage = options.getMap("android")!!.getInt("usage")
+
+    val result = setupAudioStreamNative(sampleRate, channelCount, usage)
     val map = Arguments.createMap()
     result.error?.let { map.putString("error", it) } ?: map.putNull("error")
     return map
@@ -185,7 +190,7 @@ class AudioPlaybackModule internal constructor(context: ReactApplicationContext)
     unloadSoundsNative(null)
   }
 
-  private external fun setupAudioStreamNative(sampleRate: Double, channelCount: Double): SetupAudioStreamResult
+  private external fun setupAudioStreamNative(sampleRate: Double, channelCount: Double, usage: Int): SetupAudioStreamResult
   private external fun openAudioStreamNative(): OpenAudioStreamResult
   private external fun pauseAudioStreamNative(): PauseAudioStreamResult
   private external fun closeAudioStreamNative(): CloseAudioStreamResult

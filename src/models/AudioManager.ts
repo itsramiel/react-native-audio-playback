@@ -9,7 +9,8 @@ import {
   setSoundsVolume,
   setupAudioStream,
 } from '../module';
-import { IosAudioSessionCategory } from '../NativeAudioPlayback';
+
+import { AndroidAudioStreamUsage, IosAudioSessionCategory } from '../types';
 import { Player } from './Player';
 
 export class AudioManager {
@@ -23,17 +24,25 @@ export class AudioManager {
     ios?: {
       audioSessionCategory?: IosAudioSessionCategory;
     };
+    android?: {
+      usage?: AndroidAudioStreamUsage;
+    };
   }) {
     const sampleRate = options?.sampleRate ?? 44100;
     const channelCount = options?.channelCount ?? 2;
     const iosAudioSessionCategory =
       options?.ios?.audioSessionCategory ?? IosAudioSessionCategory.Playback;
+    const androidUsage =
+      options?.android?.usage ?? AndroidAudioStreamUsage.Media;
 
     setupAudioStream({
       channelCount,
       sampleRate,
       ios: {
         audioSessionCategory: iosAudioSessionCategory,
+      },
+      android: {
+        usage: androidUsage,
       },
     });
   }

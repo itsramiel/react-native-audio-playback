@@ -83,8 +83,13 @@ std::vector<std::string> jniStringArrayToStringVector(JNIEnv* env, jobjectArray 
 
 extern "C" {
 JNIEXPORT jobject JNICALL
-Java_com_audioplayback_AudioPlaybackModule_setupAudioStreamNative(JNIEnv *env, jobject thiz, jdouble sample_rate, jdouble channel_count) {
-    auto result = audioEngine->setupAudioStream(sample_rate, channel_count);
+Java_com_audioplayback_AudioPlaybackModule_setupAudioStreamNative(
+        JNIEnv *env,
+        jobject thiz,
+        jdouble sample_rate,
+        jdouble channel_count,
+        jint usage) {
+    auto result = audioEngine->setupAudioStream(sample_rate, channel_count, usage);
 
     jclass structClass = env->FindClass("com/audioplayback/models/SetupAudioStreamResult");
     jmethodID constructor = env->GetMethodID(structClass, "<init>", "(Ljava/lang/String;)V");

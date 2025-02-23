@@ -8,7 +8,10 @@
 
 #include "audio/AAssetDataSource.h"
 
-SetupAudioStreamResult AudioEngine::setupAudioStream(double sampleRate, double channelCount) {
+SetupAudioStreamResult AudioEngine::setupAudioStream(
+        double sampleRate,
+        double channelCount,
+        int usage) {
     if(mAudioStream) {
         return { .error =  "Setting up an audio stream while one is already available"};
     }
@@ -18,6 +21,7 @@ SetupAudioStreamResult AudioEngine::setupAudioStream(double sampleRate, double c
 
     oboe::AudioStreamBuilder builder {};
 
+    builder.setUsage(getUsageFromInt(usage));
     builder.setFormat(oboe::AudioFormat::Float);
     builder.setFormatConversionAllowed(true);
     builder.setPerformanceMode(oboe::PerformanceMode::LowLatency);
@@ -183,5 +187,23 @@ void AudioEngine::unloadSounds(const std::optional<std::vector<std::string>> &id
         }
     } else {
         mPlayers.clear();
+    }
+}
+
+oboe::Usage AudioEngine::getUsageFromInt(int usage) {
+    switch(usage) {
+        case 0: return oboe::Usage::Media;
+        case 1: return oboe::Usage::VoiceCommunication;
+        case 2: return oboe::Usage::VoiceCommunicationSignalling;
+        case 3: return oboe::Usage::Alarm;
+        case 4: return oboe::Usage::Notification;
+        case 5: return oboe::Usage::NotificationRingtone;
+        case 6: return oboe::Usage::NotificationEvent;
+        case 7: return oboe::Usage::AssistanceAccessibility;
+        case 8: return oboe::Usage::AssistanceNavigationGuidance;
+        case 9: return oboe::Usage::AssistanceSonification;
+        case 10: return oboe::Usage::Game;
+        case 11: return oboe::Usage::Assistant;
+        default: return oboe::Usage::Media;
     }
 }

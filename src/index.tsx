@@ -1,2 +1,2 @@
 export { AudioManager, Player } from './models';
-export { IosAudioSessionCategory } from './NativeAudioPlayback';
+export { IosAudioSessionCategory, AndroidAudioStreamUsage } from './types';

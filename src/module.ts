@@ -1,5 +1,7 @@
 import { Image, NativeModules, Platform } from 'react-native';
-import type { IosAudioSessionCategory, Spec } from './NativeAudioPlayback';
+
+import type { Spec } from './NativeAudioPlayback';
+import type { AndroidAudioStreamUsage, IosAudioSessionCategory } from './types';
 
 const LINKING_ERROR =
   `The package 'react-native-audio-playback' doesn't seem to be linked. Make sure: \n\n` +
@@ -31,12 +33,18 @@ export function setupAudioStream(options: {
   ios: {
     audioSessionCategory: IosAudioSessionCategory;
   };
+  android: {
+    usage: AndroidAudioStreamUsage;
+  };
 }): void {
   const res = AudioPlayback.setupAudioStream({
     sampleRate: options.sampleRate,
     channelCount: options.channelCount,
     ios: {
       audioSessionCategory: options.ios.audioSessionCategory,
+    },
+    android: {
+      usage: options.android.usage,
     },
   });
   if (res.error) {
