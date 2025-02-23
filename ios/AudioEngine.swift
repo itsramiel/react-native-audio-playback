@@ -59,10 +59,6 @@ class AudioEngine {
   private var interruptionState: InterruptionState?
 
   init() {
-    // configure Audio Session
-    let audioSession = AVAudioSession.sharedInstance()
-    try? audioSession.setCategory(.playback)
-    try? audioSession.setActive(true)
 
     NotificationCenter.default.addObserver(
       self,
@@ -101,10 +97,19 @@ class AudioEngine {
     }
   }
 
-  public func setupAudioStream(sampleRate: Double, channelCount: Int) throws {
+  public func setupAudioStream(
+    sampleRate: Double,
+    channelCount: Int,
+    audioSessionCategory: AVAudioSession.Category
+  ) throws {
     guard audioStreamState != .initialized else {
       throw AudioEngineError.audioStreamAlreadyInitialized
     }
+    
+    // configure Audio Session
+    let audioSession = AVAudioSession.sharedInstance()
+    try? audioSession.setCategory(audioSessionCategory)
+    try? audioSession.setActive(true)
 
     self.desiredSampleRate = sampleRate
     self.desiredChannelCount = channelCount

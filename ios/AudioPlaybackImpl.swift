@@ -6,9 +6,21 @@ import AudioToolbox
   private static let unknownError: String = "An unknown error occurred while loading the audio file. Please create an issue with a reproducible"
   let audioEngine = AudioEngine()
 
-  @objc public func setupAudioStream(sampleRate: Double, channelCount: Double) -> String? {
+  @objc public func setupAudioStream(
+    sampleRate: Double,
+    channelCount: Double,
+    audioSessionCategory: Double
+  ) -> String? {
+    guard let audioSessionCategoryEnum = getAudoSessionCategoryEnumMemeberFromRawValue(audioSessionCategory) else {
+      return "Invalid audio session category"
+    }
+
     do {
-      try audioEngine.setupAudioStream(sampleRate: sampleRate, channelCount: Int(channelCount))
+      try audioEngine.setupAudioStream(
+        sampleRate: sampleRate,
+        channelCount: Int(channelCount),
+        audioSessionCategory: audioSessionCategoryEnum
+      )
       return nil
     } catch let error as AudioEngineError {
       return error.localizedDescription
@@ -150,6 +162,18 @@ import AudioToolbox
       }
     }
     return result
+  }
+
+  private func getAudoSessionCategoryEnumMemeberFromRawValue(_ rawValue: Double) -> AVAudioSession.Category? {
+    switch Int(rawValue) {
+    case 0: return .ambient
+    case 1: return .multiRoute
+    case 2: return .playAndRecord
+    case 3: return .playback
+    case 4: return .record
+    case 5: return .soloAmbient
+    default: return nil
+    }
   }
 }
 

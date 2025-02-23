@@ -16,7 +16,7 @@
 
 class AudioEngine : public oboe::AudioStreamDataCallback{
 public:
-    SetupAudioStreamResult setupAudioStream(double sampleRate, double channelCount);
+    SetupAudioStreamResult setupAudioStream(double sampleRate, double channelCount, int usage);
     OpenAudioStreamResult openAudioStream();
     PauseAudioStreamResult pauseAudioStream();
     CloseAudioStreamResult closeAudioStream();
@@ -34,6 +34,8 @@ private:
     std::map<std::string, std::unique_ptr<Player>> mPlayers;
     int32_t mDesiredSampleRate{};
     int mDesiredChannelCount{};
+
+    oboe::Usage getUsageFromInt(int usage);
 };
 
 #endif //AUDIOPLAYBACK_AUDIOENGINE_H

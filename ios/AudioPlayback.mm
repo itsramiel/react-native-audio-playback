@@ -20,8 +20,13 @@
 
 RCT_EXPORT_MODULE()
 
-RCT_EXPORT_SYNCHRONOUS_TYPED_METHOD(NSDictionary *, setupAudioStream:(double)sampleRate channelCount:(double)channelCount) {
-  NSString *error = [moduleImpl setupAudioStreamWithSampleRate:sampleRate channelCount:channelCount];
+RCT_EXPORT_SYNCHRONOUS_TYPED_METHOD(NSDictionary *, setupAudioStream:(JS::NativeAudioPlayback::SpecSetupAudioStreamOptions &)options) {
+  double sampleRate = options.sampleRate();
+  double channelCount = options.channelCount();
+  double audioSessionCategory = options.ios().audioSessionCategory();
+
+
+  NSString *error = [moduleImpl setupAudioStreamWithSampleRate:sampleRate channelCount:channelCount audioSessionCategory: audioSessionCategory];
 
   return @{@"error":error?: [NSNull null]};
 }

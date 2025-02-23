@@ -1,4 +1,7 @@
-import { AudioManager } from 'react-native-audio-playback';
+import {
+  AndroidAudioStreamUsage,
+  AudioManager,
+} from 'react-native-audio-playback';
 
 import { Button } from './Button';
 import { Section } from './Section';
@@ -9,7 +12,11 @@ interface StreamControlProps {
 
 export function StreamControl({ onLoadSounds }: StreamControlProps) {
   function onSetupStream() {
-    AudioManager.shared.setupAudioStream();
+    AudioManager.shared.setupAudioStream({
+      android: {
+        usage: AndroidAudioStreamUsage.Alarm,
+      },
+    });
   }
 
   function onOpenStream() {

@@ -2,10 +2,16 @@ import type { TurboModule } from 'react-native';
 import { TurboModuleRegistry } from 'react-native';
 
 export interface Spec extends TurboModule {
-  setupAudioStream: (
-    sampleRate: number,
-    channelCount: number
-  ) => { error: string | null };
+  setupAudioStream: (options: {
+    sampleRate: number;
+    channelCount: number;
+    ios: {
+      audioSessionCategory: number;
+    };
+    android: {
+      usage: number;
+    };
+  }) => { error: string | null };
   openAudioStream: () => { error: string | null };
   pauseAudioStream: () => { error: string | null };
   closeAudioStream: () => { error: string | null };
