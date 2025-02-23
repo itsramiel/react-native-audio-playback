@@ -10,8 +10,8 @@ import Foundation
 import AVFoundation
 import AudioToolbox
 
-enum AudioStreamState {
-  case initialized, opened, closed, paused
+enum AudioStreamState: Int {
+  case closed, initialized, opened, paused
 }
 
 struct InterruptionState {
@@ -95,6 +95,10 @@ class AudioEngine {
     @unknown default:
       break
     }
+  }
+
+  public func getStreamState() -> AudioStreamState {
+    return audioStreamState
   }
 
   public func setupAudioStream(

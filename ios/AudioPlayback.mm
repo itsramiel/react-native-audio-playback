@@ -79,6 +79,11 @@ RCT_EXPORT_METHOD(setSoundsVolume:(NSArray *)arg) {
   [moduleImpl setSoundsVolumeWithArg:arg];
 }
 
+RCT_EXPORT_SYNCHRONOUS_TYPED_METHOD(NSNumber *, getStreamState) {
+  return @([moduleImpl getAudioStreamState]);
+}
+
+
 // Don't compile this code when we build for the old architecture.
 #ifdef RCT_NEW_ARCH_ENABLED
 - (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:

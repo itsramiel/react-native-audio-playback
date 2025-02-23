@@ -6,6 +6,10 @@ import AudioToolbox
   private static let unknownError: String = "An unknown error occurred while loading the audio file. Please create an issue with a reproducible"
   let audioEngine = AudioEngine()
 
+  @objc public func getAudioStreamState() -> Double {
+    return Double(audioEngine.getStreamState().rawValue)
+  }
+
   @objc public func setupAudioStream(
     sampleRate: Double,
     channelCount: Double,

@@ -1,7 +1,11 @@
 import { Image, NativeModules, Platform } from 'react-native';
 
 import type { Spec } from './NativeAudioPlayback';
-import type { AndroidAudioStreamUsage, IosAudioSessionCategory } from './types';
+import {
+  StreamState,
+  type AndroidAudioStreamUsage,
+  type IosAudioSessionCategory,
+} from './types';
 
 const LINKING_ERROR =
   `The package 'react-native-audio-playback' doesn't seem to be linked. Make sure: \n\n` +
@@ -111,4 +115,22 @@ export async function loadSound(requiredAsset: number): Promise<string> {
 
 export function unloadSound(playerId: string) {
   AudioPlayback.unloadSound(playerId);
+}
+
+export function getStreamState(): StreamState {
+  const streamStateRaw = AudioPlayback.getStreamState();
+  switch (streamStateRaw) {
+    case 0:
+      return StreamState.closed;
+    case 1:
+      return StreamState.initialized;
+    case 2:
+      return StreamState.open;
+    case 3:
+      return StreamState.paused;
+    default:
+      throw new Error(
+        'Unknown stream state. Please create an issue with a reproducible'
+      );
+  }
 }
