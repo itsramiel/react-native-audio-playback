@@ -128,6 +128,11 @@ class AudioPlaybackModule internal constructor(context: ReactApplicationContext)
     }
   }
 
+  @ReactMethod(isBlockingSynchronousMethod = true)
+  override fun getStreamState(): Double {
+    return getStreamStateNative().toDouble()
+  }
+
   private fun readableArrayToStringBooleanArray(arg: ReadableArray): Pair<Array<String>, BooleanArray> {
     val size = arg.size()
     // Arrays to hold the results
@@ -200,6 +205,7 @@ class AudioPlaybackModule internal constructor(context: ReactApplicationContext)
   private external fun setSoundsVolumeNative(ids: Array<String>, values: DoubleArray)
   private external fun loadSoundNative(fd: Int, fileLength: Int, fileOffset: Int): LoadSoundResult
   private external fun unloadSoundsNative(ids: Array<String>?)
+  private external fun getStreamStateNative(): Int
 
   // Example method
   // See https://reactnative.dev/docs/native-modules-android

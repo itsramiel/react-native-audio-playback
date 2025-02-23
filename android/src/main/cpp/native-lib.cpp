@@ -85,7 +85,7 @@ extern "C" {
 JNIEXPORT jobject JNICALL
 Java_com_audioplayback_AudioPlaybackModule_setupAudioStreamNative(
         JNIEnv *env,
-        jobject thiz,
+        jobject,
         jdouble sample_rate,
         jdouble channel_count,
         jint usage) {
@@ -105,7 +105,7 @@ Java_com_audioplayback_AudioPlaybackModule_setupAudioStreamNative(
 }
 
 JNIEXPORT jobject JNICALL
-Java_com_audioplayback_AudioPlaybackModule_openAudioStreamNative(JNIEnv *env, jobject thiz) {
+Java_com_audioplayback_AudioPlaybackModule_openAudioStreamNative(JNIEnv *env, jobject) {
     auto result = audioEngine->openAudioStream();
 
     jclass structClass = env->FindClass("com/audioplayback/models/OpenAudioStreamResult");
@@ -122,7 +122,7 @@ Java_com_audioplayback_AudioPlaybackModule_openAudioStreamNative(JNIEnv *env, jo
 }
 
 JNIEXPORT jobject JNICALL
-Java_com_audioplayback_AudioPlaybackModule_pauseAudioStreamNative(JNIEnv *env, jobject thiz) {
+Java_com_audioplayback_AudioPlaybackModule_pauseAudioStreamNative(JNIEnv *env, jobject ) {
     auto result = audioEngine->pauseAudioStream();
 
     jclass structClass = env->FindClass("com/audioplayback/models/PauseAudioStreamResult");
@@ -140,7 +140,7 @@ Java_com_audioplayback_AudioPlaybackModule_pauseAudioStreamNative(JNIEnv *env, j
 
 
 JNIEXPORT jobject JNICALL
-Java_com_audioplayback_AudioPlaybackModule_closeAudioStreamNative(JNIEnv *env, jobject thiz) {
+Java_com_audioplayback_AudioPlaybackModule_closeAudioStreamNative(JNIEnv *env, jobject ) {
     auto result = audioEngine->closeAudioStream();
 
     jclass structClass = env->FindClass("com/audioplayback/models/CloseAudioStreamResult");
@@ -157,7 +157,7 @@ Java_com_audioplayback_AudioPlaybackModule_closeAudioStreamNative(JNIEnv *env, j
 }
 
 JNIEXPORT void JNICALL
-Java_com_audioplayback_AudioPlaybackModule_unloadSoundsNative(JNIEnv *env, jobject thiz,
+Java_com_audioplayback_AudioPlaybackModule_unloadSoundsNative(JNIEnv *env, jobject ,
                                                               jobjectArray ids) {
     if(ids == nullptr) {
         audioEngine->unloadSounds(std::nullopt);
@@ -168,7 +168,7 @@ Java_com_audioplayback_AudioPlaybackModule_unloadSoundsNative(JNIEnv *env, jobje
 
 
 JNIEXPORT jobject JNICALL
-Java_com_audioplayback_AudioPlaybackModule_loadSoundNative(JNIEnv *env, jobject instance, jint fd, jint fileLength, jint fileOffset) {
+Java_com_audioplayback_AudioPlaybackModule_loadSoundNative(JNIEnv *env, jobject , jint fd, jint fileLength, jint fileOffset) {
    auto result = audioEngine->loadSound(fd, fileOffset, fileLength);
 
    // Once done, close the file descriptor
@@ -195,27 +195,33 @@ Java_com_audioplayback_AudioPlaybackModule_loadSoundNative(JNIEnv *env, jobject 
 
 
 JNIEXPORT void JNICALL
-Java_com_audioplayback_AudioPlaybackModule_playSoundsNative(JNIEnv *env, jobject thiz, jobjectArray ids,
+Java_com_audioplayback_AudioPlaybackModule_playSoundsNative(JNIEnv *env, jobject , jobjectArray ids,
                                           jbooleanArray values) {
     audioEngine->playSounds(zipStringBooleanArrays(env, ids, values));
 }
 
 JNIEXPORT void JNICALL
-Java_com_audioplayback_AudioPlaybackModule_loopSoundsNative(JNIEnv *env, jobject thiz, jobjectArray ids,
+Java_com_audioplayback_AudioPlaybackModule_loopSoundsNative(JNIEnv *env, jobject , jobjectArray ids,
                                           jbooleanArray values) {
     audioEngine->loopSounds(zipStringBooleanArrays(env, ids, values));
 }
 
 JNIEXPORT void JNICALL
-Java_com_audioplayback_AudioPlaybackModule_seekSoundsToNative(JNIEnv *env, jobject thiz, jobjectArray ids,
+Java_com_audioplayback_AudioPlaybackModule_seekSoundsToNative(JNIEnv *env, jobject , jobjectArray ids,
                                             jdoubleArray values) {
     audioEngine->seekSoundsTo(zipStringDoubleArrays(env, ids, values));
 }
 
 JNIEXPORT void JNICALL
-Java_com_audioplayback_AudioPlaybackModule_setSoundsVolumeNative(JNIEnv *env, jobject thiz,
+Java_com_audioplayback_AudioPlaybackModule_setSoundsVolumeNative(JNIEnv *env, jobject ,
                                                                  jobjectArray ids,
                                                                  jdoubleArray values) {
     audioEngine->setSoundsVolume(zipStringDoubleArrays(env, ids, values));
 }
+}
+
+extern "C"
+JNIEXPORT jint JNICALL
+Java_com_audioplayback_AudioPlaybackModule_getStreamStateNative(JNIEnv *, jobject ) {
+    return static_cast<int>(audioEngine->getStreamState());
 }

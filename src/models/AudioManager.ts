@@ -1,5 +1,6 @@
 import {
   closeAudioStream,
+  getStreamState,
   loadSound,
   loopSounds,
   openAudioStream,
@@ -10,7 +11,11 @@ import {
   setupAudioStream,
 } from '../module';
 
-import { AndroidAudioStreamUsage, IosAudioSessionCategory } from '../types';
+import {
+  AndroidAudioStreamUsage,
+  IosAudioSessionCategory,
+  StreamState,
+} from '../types';
 import { Player } from './Player';
 
 export class AudioManager {
@@ -78,5 +83,9 @@ export class AudioManager {
 
   public setSoundsVolume(args: ReadonlyArray<[Player, number]>): void {
     setSoundsVolume(args.map(([player, volume]) => [player.id, volume]));
+  }
+
+  public getStreamState(): StreamState {
+    return getStreamState();
   }
 }

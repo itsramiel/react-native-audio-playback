@@ -121,7 +121,8 @@ AudioManager.shared.<some-method>
 - `playSounds(args: ReadonlyArray<[Player, boolean]>): void` Plays/pauses multiple sounds
 - `loopSounds(args: ReadonlyArray<[Player, boolean]>): void` Loops/unloops multiple sounds
 - `seekSoundsTo(args: ReadonlyArray<[Player, number]>): void` Seeks multiple sounds
-- `public setSoundsVolume(args: ReadonlyArray<[Player, number]>): void` Sets the volume of multiple sounds, volume should be a number between 0 and 1.
+- `setSoundsVolume(args: ReadonlyArray<[Player, number]>): void` Sets the volume of multiple sounds, volume should be a number between 0 and 1.
+- `getStreamState(): StreamState` Returns the current state of the stream.
 
 ### Player
 

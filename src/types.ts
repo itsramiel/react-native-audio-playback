@@ -21,3 +21,10 @@ export enum AndroidAudioStreamUsage {
   Game,
   Assistant,
 }
+
+export enum StreamState {
+  closed,
+  initialized,
+  open,
+  paused,
+}

@@ -23,6 +23,7 @@ export interface Spec extends TurboModule {
   loadSound: (
     uri: string
   ) => Promise<{ id: string | null; error: string | null }>;
+  getStreamState: () => number;
 }
 
 export default TurboModuleRegistry.getEnforcing<Spec>('AudioPlayback');
