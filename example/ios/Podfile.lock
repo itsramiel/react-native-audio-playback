@@ -1210,7 +1210,7 @@ PODS:
     - React-jsiexecutor
     - React-RCTFBReactNativeSpec
     - ReactCommon/turbomodule/core
-  - react-native-audio-playback (1.0.5):
+  - react-native-audio-playback (1.0.6):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1818,7 +1818,7 @@ SPEC CHECKSUMS:
   React-logger: e7eeebaed32b88dcc29b10901aa8c5822dc397c4
   React-Mapbuffer: 73dd1210c4ecf0dfb4e2d4e06f2a13f824a801a9
   React-microtasksnativemodule: d03753688e2abf135edcd4160ab3ce7526da8b0d
-  react-native-audio-playback: 6b828a31071736a3beee00128fd445c6fb3016ef
+  react-native-audio-playback: e3b40982c3b6dff7dc0ed0680d7481d43a8f54dc
   react-native-slider: 54e7f67e9e4c92c0edac77bbf58abfaf1f60055f
   React-nativeconfig: cb207ebba7cafce30657c7ad9f1587a8f32e4564
   React-NativeModulesApple: 8411d548b1ad9d2b3e597beb9348e715c8020e0c

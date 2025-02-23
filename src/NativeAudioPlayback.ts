@@ -1,11 +1,23 @@
 import type { TurboModule } from 'react-native';
 import { TurboModuleRegistry } from 'react-native';
 
+export enum IosAudioSessionCategory {
+  Ambient,
+  MultiRoute,
+  PlayAndRecord,
+  Playback,
+  Record,
+  SoloAmbient,
+}
+
 export interface Spec extends TurboModule {
-  setupAudioStream: (
-    sampleRate: number,
-    channelCount: number
-  ) => { error: string | null };
+  setupAudioStream: (options: {
+    sampleRate: number;
+    channelCount: number;
+    ios: {
+      audioSessionCategory: number;
+    };
+  }) => { error: string | null };
   openAudioStream: () => { error: string | null };
   pauseAudioStream: () => { error: string | null };
   closeAudioStream: () => { error: string | null };
