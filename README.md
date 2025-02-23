@@ -24,14 +24,15 @@ For iOS, run `pod install` in the `ios` directory.
 
 ## Usage
 
-1. Setup an Audio Stream using the singleton `AudioManager`'s `shared` static property and calling its `setupAudioStream(sampleRate: number, channelCount: number): void`
+1. Setup an Audio Stream using the singleton `AudioManager`'s `shared` static property and calling its `setupAudioStream`.
+   `setupAudioStream` takes in an optional options argument where you can pass in the `sampleRate` and `channelCount` of your audio files, or do not specify them and it will default to `44100` and `2` respectively.
 
 [How do I know what `sampleRate` and `channelCount` I need to pass?](#sample-rates-and-channel-counts)
 
 ```ts
 import { AudioManager } from 'react-native-audio-playback';
 
-AudioManager.shared.setupAudioStream(44100, 2);
+AudioManager.shared.setupAudioStream({ sampleRate: 44100, channelCount: 2 });
 ```
 
 2. Load in your audio sounds as such:
@@ -96,8 +97,20 @@ AudioManager.shared.<some-method>
 
 #### Methods:
 
-- `setupAudioStream(sampleRate: number = 44100, channelCount: number = 2): void`: sets up the Audio Stream to allow it later be opened.
-  Note: You shouldn't setup multiple streams simultaneously because you only need one stream. Trying to setup another one will simply fails because there is already one setup.
+- `setupAudioStream(options?: {
+  sampleRate?: number;
+  channelCount?: number;
+  ios?: {
+    audioSessionCategory?: IosAudioSessionCategory;
+  };
+  android?: {
+    usage?: AndroidAudioStreamUsage;
+  };
+}): void`: sets up the Audio Stream to allow it later be opened.
+  Notes:
+  1. You shouldn't setup multiple streams simultaneously because you only need one stream. Trying to setup another one will simply fails because there is already one setup.
+  2. You can change the ios audio session category using the `audioSessionCategory` option in the `ios` object. Check [apple docs](https://developer.apple.com/documentation/avfaudio/avaudiosession/category-swift.struct#Getting-Standard-Categories) for more info on the different audio session categories.
+  3. You can change the android usage using the `usage` option in the `android` object. Check [here](https://github.com/google/oboe/blob/11afdfcd3e1c46dc2ea4b86c83519ebc2d44a1d4/include/oboe/Definitions.h#L316-L377) for the list of options.
 - `openAudioStream(): void`: Opens the audio stream to allow audio to be played
   Note: You should have called `setupAudioStream` before calling this method. You can't open a stream that hasn't been setup
 - `pauseAudioStream(): void`: Pauses the audio stream (An example of when to use this is when user puts app to background)
