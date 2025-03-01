@@ -24,14 +24,14 @@
 #include "utils/logging.h"
 
 struct DecodeFileDescriptorResult {
-    int32_t bytesRead;
+    std::optional<std::vector<uint8_t>> data;
     std::optional<std::string> error;
 };
 
 
 class NDKExtractor {
 public:
-    static DecodeFileDescriptorResult decodeFileDescriptor(int fd, int offset, int length, uint8_t *targetData, AudioProperties targetProperties);
+    static DecodeFileDescriptorResult decodeFileDescriptor(int fd, int offset, int length, AudioProperties targetProperties);
 };
 
 #endif //AUDIOPLAYBACK_NDKMEDIAEXTRACTOR_H
