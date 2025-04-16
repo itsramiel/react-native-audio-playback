@@ -20,6 +20,8 @@
 
 RCT_EXPORT_MODULE()
 
+// Remove the old arch implementation when deprecating old arch
+#ifdef RCT_NEW_ARCH_ENABLED
 RCT_EXPORT_SYNCHRONOUS_TYPED_METHOD(NSDictionary *, setupAudioStream:(JS::NativeAudioPlayback::SpecSetupAudioStreamOptions &)options) {
   double sampleRate = options.sampleRate();
   double channelCount = options.channelCount();
@@ -30,6 +32,19 @@ RCT_EXPORT_SYNCHRONOUS_TYPED_METHOD(NSDictionary *, setupAudioStream:(JS::Native
 
   return @{@"error":error?: [NSNull null]};
 }
+#else
+RCT_EXPORT_SYNCHRONOUS_TYPED_METHOD(NSDictionary *, setupAudioStream:(NSDictionary *)options) {
+  double sampleRate = [options[@"sampleRate"] doubleValue];
+  double channelCount = [options[@"channelCount"] doubleValue];
+  double audioSessionCategory = [options[@"ios"][@"audioSessionCategory"] doubleValue];
+
+
+  NSString *error = [moduleImpl setupAudioStreamWithSampleRate:sampleRate channelCount:channelCount audioSessionCategory: audioSessionCategory];
+
+  return @{@"error":error?: [NSNull null]};
+}
+#endif
+
 
 RCT_EXPORT_SYNCHRONOUS_TYPED_METHOD(NSDictionary *, openAudioStream) {
   NSString *error = [moduleImpl openAudioStream];
