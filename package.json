@@ -1,6 +1,6 @@
 {
   "name": "react-native-audio-playback",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "description": "Play sounds with lowest latency in React Native using Google Oboe for Android and Audio Unit for iOS",
   "source": "./src/index.tsx",
   "main": "./lib/commonjs/index.js",
