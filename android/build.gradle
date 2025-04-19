@@ -70,6 +70,7 @@ android {
       }
     }
 
+    consumerProguardFiles 'proguard-rules.pro'
   }
 
   buildFeatures {
