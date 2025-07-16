@@ -1,5 +1,7 @@
 # react-native-audio-playback
 
+⚠️⚠️ **This library is archived in favor of [react-native-audi-api](https://github.com/software-mansion/react-native-audio-api), which provides the same perf and control, but is maintained by software mansion which has more time and resources than me to provide a stable library.**
+
 ⚡ Highest perf, lowest-latency react native library to play sounds on iOS/Android
 
 For Android, it uses [Google's C++ Oboe](https://github.com/google/oboe)
